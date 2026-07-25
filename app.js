@@ -2,7 +2,6 @@ process.on("uncaughtException", (err) => {
     console.error("UNCAUGHT EXCEPTION ");
     console.error(err.name);
     console.error(err.message);
-
     process.exit(1);
 });
 
