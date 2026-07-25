@@ -1,6 +1,6 @@
 const GlobalError = (err, req, res, next) => {
-    err.statuscode = statuscode || 500
-    err.status = status || "Error"
+    err.statuscode = err.statuscode || 500
+    err.status = err.status || "Error"
     res.status(err.statuscode).json({
         status: err.status,
         message: err.message,
