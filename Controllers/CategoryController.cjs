@@ -1,14 +1,16 @@
 const CategoryModel = require('../Models/CategorySchema.cjs')
-const slugify = require('slugify');
 const asyncHandler = require('express-async-handler');
+const ApiError = require('../utils/ApiError.cjs')
 const { Result } = require('express-validator');
+const slugify = require('slugify');
+
 
 /**
  * @desc    Get all categories
  * @route   GET /api/category
  * @access  Public
  */
-exports.GetAllCategory = asyncHandler(async (req, res) => {
+exports.GetAllCategory = asyncHandler(async (req, res,) => {
 
     // Req Query
 
@@ -19,7 +21,7 @@ exports.GetAllCategory = asyncHandler(async (req, res) => {
     //  Get CategoryModel  
 
     const Categories = await CategoryModel.find({}).skip(Skip).limit(limit)
-    return res.status(204).json({
+    return res.status(200).json({
         Results: Categories.length,
         message: "Categories retrieved  Successfuly",
         data: Categories
@@ -32,16 +34,13 @@ exports.GetAllCategory = asyncHandler(async (req, res) => {
  * @access  Public
  */
 
-exports.GetCategoryByID = asyncHandler(async (req, res) => {
+exports.GetCategoryByID = asyncHandler(async (req, res,next) => {
     const id = req.params.id
     const Category = await CategoryModel.findById(id)
     if (!Category) {
-        return res.status(404).json({
-            message: ` Not Found this Categroy By this ID ${id}`,
-            data: null
-        })
+        return next(new ApiError(` Not Found this Categroy By this ID ${id}`, 404))
     }
-    res.status(204).json({
+    res.status(200).json({
         message: "the Category retrieved successfully",
         data: Category
     })
@@ -52,10 +51,10 @@ exports.GetCategoryByID = asyncHandler(async (req, res) => {
  * @route   POST /api/category
  * @access  Private
  */
-exports.CreateCategory = asyncHandler(async (req, res) => {
-    const name = req.body.name
+exports.CreateCategory = asyncHandler(async (req, res,) => {
+    const {name} = req.body
     const Category = await CategoryModel.create({ name, slug: slugify(name) })
-    return res.status(204).json({
+    return res.status(201).json({
         message: "Category Created Successfuly",
         data: Category
     })
@@ -66,17 +65,15 @@ exports.CreateCategory = asyncHandler(async (req, res) => {
  * @route   PUT /api/category/:id
  * @access  Private
  */
-exports.UpdateCategoryByID = asyncHandler(async (req, res) => {
+exports.UpdateCategoryByID = asyncHandler(async (req, res,next) => {
     const { id } = req.params
     const { name } = req.body
     const Category = await CategoryModel.findOneAndUpdate({ _id: id }, { name, slug: slugify(name) }, { returnDocument: true })
     if (!Category) {
-        return res.status(404).json({
-            message: ` Not Found this Categroy By this ID ${id}`,
-            data: null
-        })
+        return next(new ApiError(` Not Found this Categroy By this ID ${id}`, 404))
+
     }
-    res.status(204).json({
+    res.status(200).json({
         message: "the Category retrieved successfully",
         data: Category
     })
@@ -88,16 +85,14 @@ exports.UpdateCategoryByID = asyncHandler(async (req, res) => {
  * @route   DELETE /api/category/:id
  * @access  Private
  */
-exports.DeleteCategoryByID = asyncHandler(async (req, res) => {
+exports.DeleteCategoryByID = asyncHandler(async (req, res,next) => {
     const { id } = req.params
-    const DeleteCategory = await CategoryModel.findOneAndDelete(id)
+    const DeleteCategory = await CategoryModel.findOneAndDelete({_id :id})
     if (!DeleteCategory) {
-        return res.status(404).json({
-            message: ` Not Found this Categroy By this ID ${id}`,
-            data: null
-        })
+        return next(new ApiError(` Not Found this Categroy By this ID ${id}`, 404))
+
     }
-    res.status(204).json({
+    res.status(200).json({
         message: "the Category Deleted successfully",
         data: DeleteCategory
     })
