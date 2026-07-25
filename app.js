@@ -26,8 +26,9 @@ const ConnectToDB = async () => {
 
 ConnectToDB()
 app.use('/', CategoryRouter)
-// error Listen 
 
+
+// error Listen 
 
 app.use((req,res,next)=>{
     next(new ApiError(`Can't find this route: ${req.originalUrl}`, 404))
@@ -37,6 +38,7 @@ app.use((req,res,next)=>{
 app.use(GlobalError);
 
 // listening to Server 
+
 app.listen(Port, () => {
     console.log(`Server Runing at ${Port} ....`)
 })
