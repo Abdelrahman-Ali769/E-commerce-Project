@@ -19,7 +19,7 @@ exports.GetAllCategory = asyncHandler(async (req, res) => {
     //  Get CategoryModel  
 
     const Categories = await CategoryModel.find({}).skip(Skip).limit(limit)
-    return res.status(200).json({
+    return res.status(204).json({
         Results: Categories.length,
         message: "Categories retrieved  Successfuly",
         data: Categories
@@ -41,7 +41,7 @@ exports.GetCategoryByID = asyncHandler(async (req, res) => {
             data: null
         })
     }
-    res.status(200).json({
+    res.status(204).json({
         message: "the Category retrieved successfully",
         data: Category
     })
@@ -55,7 +55,7 @@ exports.GetCategoryByID = asyncHandler(async (req, res) => {
 exports.CreateCategory = asyncHandler(async (req, res) => {
     const name = req.body.name
     const Category = await CategoryModel.create({ name, slug: slugify(name) })
-    return res.status(201).json({
+    return res.status(204).json({
         message: "Category Created Successfuly",
         data: Category
     })
@@ -76,7 +76,7 @@ exports.UpdateCategoryByID = asyncHandler(async (req, res) => {
             data: null
         })
     }
-    res.status(200).json({
+    res.status(204).json({
         message: "the Category retrieved successfully",
         data: Category
     })
