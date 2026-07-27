@@ -1,54 +1,54 @@
 process.on("uncaughtException", (err) => {
-    console.error("UNCAUGHT EXCEPTION ");
-    console.error(err.name);
-    console.error(err.message);
+    console.error("UNCAUGHT EXCEPTION!  Shutting down...");
+    console.error(err.name, err.message);
     process.exit(1);
 });
 
 require('dotenv').config();
-const express = require("express")
-const mongoose = require("mongoose")
-const CategoryRouter = require('./Routers/CategoryRouter.cjs')
-const ApiError = require('./utils/ApiError.cjs')
-const GlobalError = require('./middlewares/ErrorMiddleware.cjs')
-const app = express()
-app.use(express.json())
+const express = require("express");
+const mongoose = require("mongoose");
+const ApiError = require('./utils/ApiError.cjs');
+const CategoryRouter = require('./Routers/CategoryRouter.cjs');
+const GlobalError = require('./middlewares/ErrorMiddleware.cjs');
 
-// Connection to Data Base 
+const app = express();
+app.use(express.json());
 
-const Uri = process.env.MONGO_URI
-const Port = process.env.PORT
+const Uri = process.env.MONGO_URI;
+const Port = process.env.PORT || 3000;
 
-const ConnectToDB = async () => {
-    mongoose.set('strictQuery', false)
-    await mongoose.connect(Uri)
-    console.log("Connection To Data base successfuly")
-}
+// Mount Routers
+app.use('/', CategoryRouter);
 
-ConnectToDB()
-app.use('/', CategoryRouter)
-
-// error Listen  for express 
-
+// 404 Error Handler for Undefined Routes
 app.use((req, res, next) => {
-    next(new ApiError(`Can't find this route: ${req.originalUrl}`, 404))
-})
+    next(new ApiError(`Can't find this route: ${req.originalUrl}`, 404));
+});
 
 // Global Error Handling Middleware
 app.use(GlobalError);
 
-// listening to Server 
+// Connect to DB and Start Server
+const startServer = async () => {
+    try {
+        mongoose.set('strictQuery', false);
+        await mongoose.connect(Uri);
+        console.log("Connection to Database successfully established.");
+        const server = app.listen(Port, () => {
+            console.log(`Server running on port ${Port} ...`);
+        });
+        // Handle Unhandled Promise Rejections
+        process.on("unhandledRejection", (err) => {
+            console.error(`UNHANDLED REJECTION!  ${err.name} : ${err.message}`);
+            server.close(() => {
+                console.error("Server shutting down...");
+                process.exit(1);
+            });
+        });
+    } catch (error) {
+        console.error("Database connection failed:", error);
+        process.exit(1);
+    }
+};
 
-const Server = app.listen(Port, () => {
-    console.log(`Server Runing at ${Port} ....`)
-})
-
-// unhandledRejection Errors 
-
-process.on("unhandledRejection", (err) => {
-    console.error(`unhandledRejection : ${err}`)
-    Server.close(() => {
-        console.error("Server Shutting Down ...")
-        process.exit(1)
-    })
-})
+startServer();

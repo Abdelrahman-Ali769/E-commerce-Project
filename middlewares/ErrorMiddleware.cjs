@@ -16,7 +16,8 @@ const GlobalError = (err, req, res, next) => {
         })
     }
 
-if (err.name === "ValidationError"){        err.statusCode = 400
+if (err.name === "ValidationError"){      
+        err.statusCode = 400
         err.status = "Fail"
     }
     if (process.env.NODE_ENV === 'development') {
