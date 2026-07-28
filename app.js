@@ -1,6 +1,6 @@
 process.on("uncaughtException", (err) => {
     console.error("UNCAUGHT EXCEPTION!  Shutting down...");
-    console.error(err.name, err.message);
+    console.error(err);
     process.exit(1);
 });
 
@@ -13,7 +13,6 @@ const GlobalError = require('./middlewares/ErrorMiddleware.cjs');
 
 const app = express();
 app.use(express.json());
-
 const Uri = process.env.MONGO_URI;
 const Port = process.env.PORT || 3000;
 
@@ -50,5 +49,4 @@ const startServer = async () => {
         process.exit(1);
     }
 };
-
 startServer();
