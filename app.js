@@ -16,6 +16,21 @@ app.use(express.json());
 const Uri = process.env.MONGO_URI;
 const Port = process.env.PORT || 3000;
 
+let server; 
+
+// Handle Unhandled Promise Rejections
+process.on("unhandledRejection", (err) => {
+    console.error(`UNHANDLED REJECTION!  ${err.name} : ${err.message}`);
+    // لو السيرفر قام واشتغل فعلاً، اقفله الأول بشكل نظيف قبل ما تقفل التطبيق
+    if (server) {
+        server.close(() => {
+            console.error("Server shutting down...");
+            process.exit(1);
+        });
+    } else {
+        process.exit(1);
+    }
+});
 // Mount Routers
 app.use('/', CategoryRouter);
 
@@ -33,17 +48,10 @@ const startServer = async () => {
         mongoose.set('strictQuery', false);
         await mongoose.connect(Uri);
         console.log("Connection to Database successfully established.");
-        const server = app.listen(Port, () => {
+        server = app.listen(Port, () => {
             console.log(`Server running on port ${Port} ...`);
         });
-        // Handle Unhandled Promise Rejections
-        process.on("unhandledRejection", (err) => {
-            console.error(`UNHANDLED REJECTION!  ${err.name} : ${err.message}`);
-            server.close(() => {
-                console.error("Server shutting down...");
-                process.exit(1);
-            });
-        });
+        
     } catch (error) {
         console.error("Database connection failed:", error);
         process.exit(1);
