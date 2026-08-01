@@ -9,6 +9,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const ApiError = require('./utils/ApiError.cjs');
 const CategoryRouter = require('./Routers/CategoryRouter.cjs');
+const SubCategoryRouter = require('./Routers/SubCategoryRouter.cjs');
 const GlobalError = require('./middlewares/ErrorMiddleware.cjs');
 
 const app = express();
@@ -33,6 +34,7 @@ process.on("unhandledRejection", (err) => {
 });
 // Mount Routers
 app.use('/', CategoryRouter);
+app.use('/', SubCategoryRouter);
 
 // 404 Error Handler for Undefined Routes
 app.use((req, res, next) => {
