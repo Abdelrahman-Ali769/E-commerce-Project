@@ -34,7 +34,7 @@ exports.GetAllCategory = asyncHandler(async (req, res,) => {
  * @access  Public
  */
 
-exports.GetCategoryByID = asyncHandler(async (req, res,next) => {
+exports.GetCategoryByID = asyncHandler(async (req, res, next) => {
     const id = req.params.id
     const Category = await CategoryModel.findById(id)
     if (!Category) {
@@ -52,7 +52,7 @@ exports.GetCategoryByID = asyncHandler(async (req, res,next) => {
  * @access  Private
  */
 exports.CreateCategory = asyncHandler(async (req, res,) => {
-    const {name} = req.body
+    const { name } = req.body
     const Category = await CategoryModel.create({ name, slug: slugify(name) })
     return res.status(201).json({
         message: "Category Created Successfuly",
@@ -65,10 +65,10 @@ exports.CreateCategory = asyncHandler(async (req, res,) => {
  * @route   PUT /api/category/:id
  * @access  Private
  */
-exports.UpdateCategoryByID = asyncHandler(async (req, res,next) => {
+exports.UpdateCategoryByID = asyncHandler(async (req, res, next) => {
     const { id } = req.params
     const { name } = req.body
-    const Category = await CategoryModel.findOneAndUpdate({ _id: id }, { name, slug: slugify(name) }, { returnDocument: true })
+    const Category = await CategoryModel.findOneAndUpdate({ _id: id }, { name, slug: slugify(name), }, { returnDocument: true })
     if (!Category) {
         return next(new ApiError(` Not Found this Categroy By this ID ${id}`, 404))
 
@@ -85,9 +85,9 @@ exports.UpdateCategoryByID = asyncHandler(async (req, res,next) => {
  * @route   DELETE /api/category/:id
  * @access  Private
  */
-exports.DeleteCategoryByID = asyncHandler(async (req, res,next) => {
+exports.DeleteCategoryByID = asyncHandler(async (req, res, next) => {
     const { id } = req.params
-    const DeleteCategory = await CategoryModel.findOneAndDelete({_id :id})
+    const DeleteCategory = await CategoryModel.findOneAndDelete({ _id: id })
     if (!DeleteCategory) {
         return next(new ApiError(` Not Found this Categroy By this ID ${id}`, 404))
 
