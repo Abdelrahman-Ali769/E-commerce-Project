@@ -22,12 +22,12 @@ exports.CreateSubCategoryValidator = [
 
 //Update-Category-validator
 exports.UpdateSubCategoryValidator = [
-    check("id").isMongoId().withMessage("Invalid Category ID Format "),
+    check("id").notEmpty().isMongoId().withMessage("Invalid Category ID Format "),
     SubCategoryValidator
 ];
 
 //Delete-Category-validator
 exports.DeleteSubCategoryValidator = [
-    check("id").isMongoId().withMessage("Invalid Category ID Format "),
+    check("id").notEmpty().isMongoId().withMessage("Invalid Category ID Format "),
     SubCategoryValidator
 ];
