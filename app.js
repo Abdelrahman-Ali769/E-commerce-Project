@@ -33,8 +33,8 @@ process.on("unhandledRejection", (err) => {
     }
 });
 // Mount Routers
-app.use('/', CategoryRouter);
-app.use('/', SubCategoryRouter);
+app.use('/api/category', CategoryRouter);
+app.use('/api/SubCategory',SubCategoryRouter );
 
 // 404 Error Handler for Undefined Routes
 app.use((req, res, next) => {

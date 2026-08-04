@@ -6,23 +6,29 @@ const { getCategoryValidator
     , DeleteCategoryValidator
 } = require('../utils/validators/CategoryValidator.cjs')
 
+const subcategoriesRouter = require('./SubCategoryRouter.cjs')
+
+
 const router = express.Router()
 
+
 // CRUD Operation From Category
+
 //GetAllCategory
-router.get('/api/Category', CategoryController.GetAllCategory)
+router.get('/', CategoryController.GetAllCategory)
 
 //GetCategoryByID
-router.get('/api/Category/:id', getCategoryValidator, CategoryController.GetCategoryByID)
+router.get('/:id', getCategoryValidator, CategoryController.GetCategoryByID)
 
 //CreateCategory
-router.post('/api/Category', CreateCategoryValidator, CategoryController.CreateCategory)
+router.post('/', CreateCategoryValidator, CategoryController.CreateCategory)
 
 //UpdateCategoryByID
-router.put('/api/Category/:id', UpdateCategoryValidator, CategoryController.UpdateCategoryByID)
+router.put('/:id', UpdateCategoryValidator, CategoryController.UpdateCategoryByID)
 
 //DeleteCategoryByID
-router.delete('/api/Category/:id', DeleteCategoryValidator, CategoryController.DeleteCategoryByID)
+router.delete('/:id', DeleteCategoryValidator, CategoryController.DeleteCategoryByID)
 
+router.use('/:categoryId/subcategories', subcategoriesRouter)
 
 module.exports = router

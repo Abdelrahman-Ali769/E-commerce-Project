@@ -16,9 +16,10 @@ exports.GetAllSubCategory = asyncHandler(async (req, res,) => {
     const limit = req.query.limit * 1 || 5;
     const Skip = (page - 1) * limit
 
-    //  Get SubCategoryModel  
-
-    const SubCategories = await SubCategoryModel.find({}).skip(Skip).limit(limit)
+    //  Get SubCategoryModel    
+        let categoryObject={}
+        if(req.params.categoryID) categoryObject = {category: req.params.categoryID}
+    const SubCategories = await SubCategoryModel.find(categoryObject).skip(Skip).limit(limit)
     return res.status(200).json({
         Results: SubCategories.length,
         message: "SubCategories retrieved  Successfuly",
@@ -34,7 +35,9 @@ exports.GetAllSubCategory = asyncHandler(async (req, res,) => {
 
 exports.GetSubCategoryByID = asyncHandler(async (req, res, next) => {
     const id = req.params.id
-    const SubCategory = await SubCategoryModel.findById(id)
+    const SubCategory = await SubCategoryModel
+    .findById(id)
+    // .populate({path: "category",select : "name-_id"})
     if (!SubCategory) {
         return next(new ApiError(` Not Found this SubCategory By this ID ${id}`, 404))
     }
@@ -70,7 +73,7 @@ exports.CreateSubCategory = asyncHandler(async (req, res) => {
 exports.UpdateSubCategory = asyncHandler(async (req, res,next) => {
     const { id } = req.params
     const { name,category } = req.body
-    const SubCategory = await SubCategoryModel.findOneAndUpdate({ _id:id }, { name, slug: slugify(name) ,category},{ returnDocument: true })
+    const SubCategory = await SubCategoryModel.findOneAndUpdate({ _id:id }, { name, slug: slugify(name) ,category},{ returnDocument: "after" })
     if (!SubCategory) {
         return next(new ApiError(` Not Found this Categroy By this ID ${id}`, 404))
     }
