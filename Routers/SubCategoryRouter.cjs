@@ -1,24 +1,24 @@
 const express = require('express')
-const SubCategoryController = require('../Controllers/SubCategoryConstroller.cjs')
+const {GetAllSubCategory,GetSubCategoryByID,CreateSubCategory,UpdateSubCategory,DeleteSubCategory,SetCategoryByID,getSubcatByCategoryID} = require('../Controllers/SubCategoryConstroller.cjs')
 const { getSubCategoryValidator, CreateSubCategoryValidator,UpdateSubCategoryValidator,DeleteSubCategoryValidator } = require('../utils/validators/SubCategoryValidator.cjs')
 
 
 const router = express.Router({mergeParams: true})
 
 // Get SubCategory 
-router.get('/', SubCategoryController.GetAllSubCategory)
+router.get('/', getSubcatByCategoryID,GetAllSubCategory)
 
 //GetSubCategoryByID
-router.get('/:id', getSubCategoryValidator, SubCategoryController.GetSubCategoryByID)
+router.get('/:id', getSubCategoryValidator,GetSubCategoryByID)
 
 //CreateCategory
-router.post('/', CreateSubCategoryValidator, SubCategoryController.CreateSubCategory)
+router.post('/', SetCategoryByID,CreateSubCategoryValidator,CreateSubCategory)
 
 //UpdateCategoryByID
-router.put('/:id', UpdateSubCategoryValidator, SubCategoryController.UpdateSubCategory)
+router.put('/:id', UpdateSubCategoryValidator,UpdateSubCategory)
 
 //DeleteCategoryByID
-router.delete('/:id', DeleteSubCategoryValidator, SubCategoryController.DeleteSubCategory)
+router.delete('/:id', DeleteSubCategoryValidator,DeleteSubCategory)
 
 
 module.exports = router
