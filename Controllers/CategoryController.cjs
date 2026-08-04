@@ -68,7 +68,7 @@ exports.CreateCategory = asyncHandler(async (req, res,) => {
 exports.UpdateCategoryByID = asyncHandler(async (req, res, next) => {
     const { id } = req.params
     const { name } = req.body
-    const Category = await CategoryModel.findOneAndUpdate({ _id: id }, { name, slug: slugify(name), }, { returnDocument: true })
+    const Category = await CategoryModel.findOneAndUpdate({ _id: id }, { name, slug: slugify(name), }, { returnDocument: "after" })
     if (!Category) {
         return next(new ApiError(` Not Found this Categroy By this ID ${id}`, 404))
 

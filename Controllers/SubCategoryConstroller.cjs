@@ -7,17 +7,18 @@ exports.SetCategoryByID =  (req, res, next) => {
     if (!req.body.category) req.body.category = req.params.categoryId
     next()
 }
-/**
- * @desc    Get all Subcategories
- * @route   GET /api/Subcategories
- * @access  Public
- */
 exports.getSubcatByCategoryID =(req,res,next)=>{
 let categoryObject = {}
     if (req.params.categoryId) categoryObject = { category: req.params.categoryId }
     req.filterObj =categoryObject
     next()
 }
+/**
+ * @desc    Get all Subcategories
+ * @route   GET /api/Subcategories
+ * @access  Public
+ */
+
 exports.GetAllSubCategory = asyncHandler(async (req, res,) => {
 
 
