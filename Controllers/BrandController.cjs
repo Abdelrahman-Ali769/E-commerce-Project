@@ -1,7 +1,6 @@
 const BrandModel = require('../Models/BrandSchema.cjs')
 const asyncHandler = require('express-async-handler');
 const ApiError = require('../utils/ApiError.cjs')
-const { Result } = require('express-validator');
 const slugify = require('slugify');
 
 /**

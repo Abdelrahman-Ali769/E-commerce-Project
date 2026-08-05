@@ -11,6 +11,7 @@ const ApiError = require('./utils/ApiError.cjs');
 const CategoryRouter = require('./Routers/CategoryRouter.cjs');
 const SubCategoryRouter = require('./Routers/SubCategoryRouter.cjs');
 const BrandRouter = require('./Routers/BrandRouter.cjs');
+const ProductRouter = require('./Routers/ProductRouter.cjs');
 const GlobalError = require('./middlewares/ErrorMiddleware.cjs');
 
 const app = express();
@@ -37,6 +38,7 @@ process.on("unhandledRejection", (err) => {
 app.use('/api/category', CategoryRouter);
 app.use('/api/SubCategory',SubCategoryRouter );
 app.use('/api/Brand',BrandRouter );
+app.use('/api/Product',ProductRouter );
 
 // 404 Error Handler for Undefined Routes
 app.use((req, res, next) => {
