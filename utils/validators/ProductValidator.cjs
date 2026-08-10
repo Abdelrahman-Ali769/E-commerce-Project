@@ -1,7 +1,9 @@
-const { check, body } = require("express-validator");
+const { check, body, Result } = require("express-validator");
 const slugify = require("slugify");
 const ValidatorMiddleware = require("../../middlewares/validatorMiddleware.cjs");
 const ProductModel = require("../../Models/ProductSchema.cjs");
+const CategoryModel = require("../../Models/CategorySchema.cjs");
+const SubcategoryModel = require("../../Models/SubcategorySchema.cjs");
 
 // Get Specific Product
 exports.GetProductValidator = [
@@ -75,12 +77,49 @@ exports.CreateProductValidator = [
     .notEmpty()
     .withMessage("Category is required.")
     .isMongoId()
-    .withMessage("Invalid Category ID Format."),
-
-  check("subCategories")
+    .withMessage("Invalid Category ID Format.")
+    .custom(async (value) => {
+      const categoryID = await CategoryModel.findById(value)
+      if (!categoryID) {
+        throw new Error("CtegoryID not found.");
+      }
+      return true
+    })
+  ,
+check("subCategories")
     .optional()
     .isArray()
-    .withMessage("SubCategories must be an array."),
+    .withMessage("SubCategories must be an array.")
+    .custom(async (subcategoriesIds) => {
+
+        const SubCategories = await SubcategoryModel.find({
+            _id: {
+                $exists: true,
+                $in: subcategoriesIds,
+            }
+        });
+        if (
+            SubCategories.length < 1 ||
+            SubCategories.length !== subcategoriesIds.length
+        ) {
+            throw new Error("Invalid subcategories IDs");
+        }
+        return true;
+    }).custom(async (val, { req }) => {
+    const subcategories = await SubcategoryModel.find({
+        category: req.body.category
+    });
+    const subCategoriesIdsInDB = subcategories.map(
+        (subCategory) => subCategory._id.toString()
+    );
+    const checker = (target, arr) => target.every((v) => arr.includes(v));
+    if (!checker(val, subCategoriesIdsInDB)) {
+        throw new Error(
+            "Subcategories do not belong to category"
+        );
+    }
+    return true;
+}),
 
   check("brand")
     .optional()
@@ -96,7 +135,6 @@ exports.CreateProductValidator = [
     .optional()
     .isNumeric()
     .withMessage("Ratings quantity must be a number."),
-
   ValidatorMiddleware,
 ];
 
