@@ -86,41 +86,41 @@ exports.CreateProductValidator = [
       return true
     })
   ,
-check("subCategories")
+  check("subCategories")
     .optional()
     .isArray()
     .withMessage("SubCategories must be an array.")
     .custom(async (subcategoriesIds) => {
 
-        const SubCategories = await SubcategoryModel.find({
-            _id: {
-                $exists: true,
-                $in: subcategoriesIds,
-            }
-        });
-        if (
-            SubCategories.length < 1 ||
-            SubCategories.length !== subcategoriesIds.length
-        ) {
-            throw new Error("Invalid subcategories IDs");
+      const SubCategories = await SubcategoryModel.find({
+        _id: {
+          $exists: true,
+          $in: subcategoriesIds,
         }
-        return true;
+      });
+      if (
+        SubCategories.length < 1 ||
+        SubCategories.length !== subcategoriesIds.length
+      ) {
+        throw new Error("Invalid subcategories IDs");
+      }
+      return true;
     }).custom(async (val, { req }) => {
-    const subcategories = await SubcategoryModel.find({
+      const subCategories = await SubcategoryModel.find({
         category: req.body.category
-    });
-    const subCategoriesIdsInDB = subcategories.map(
-        (subCategory) => subCategory._id.toString()
-    );
-    const checker = (target, arr) => target.every((v) => arr.includes(v));
-    if (!checker(val, subCategoriesIdsInDB)) {
-        throw new Error(
+      })
+      const SubcategorybyIDinDB = subCategories.map(
+        (item) => item._id.toString()
+      )
+      const checker = (target, arr) =>
+        target.every((v) => arr.includes(v));
+        if (!checker(val, SubcategorybyIDinDB)) {
+          throw new Error(
             "Subcategories do not belong to category"
-        );
-    }
-    return true;
-}),
-
+          );
+        }
+      return true
+    }),
   check("brand")
     .optional()
     .isMongoId()
