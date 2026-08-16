@@ -9,13 +9,20 @@ const slugify = require("slugify");
  * @access  Public
  */
 exports.GetAllProducts = asyncHandler(async (req, res) => {
+    // Filtering Field
+    const queryStrigObj = { ...req.query }
+    const excludeFiled = ['page', 'limit', 'sort', 'Fields']
+    excludeFiled.forEach((Fieled) => delete queryStrigObj[Fieled])
+    console.log(queryStrigObj)
+
     // Pagination
     const page = req.query.page * 1 || 1;
     const limit = req.query.limit * 1 || 5;
     const skip = (page - 1) * limit;
 
     // Get Products
-    const products = await ProductModel.find({}).skip(skip).limit(limit);
+    const mongooseQuery = ProductModel.find(queryStrigObj).skip(skip).limit(limit);
+    const products = await mongooseQuery
 
     res.status(200).json({
         results: products.length,
