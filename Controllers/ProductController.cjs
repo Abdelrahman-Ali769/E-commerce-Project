@@ -9,20 +9,63 @@ const slugify = require("slugify");
  * @access  Public
  */
 exports.GetAllProducts = asyncHandler(async (req, res) => {
-    // Filtering Field
-    const queryStrigObj = { ...req.query }
-    const excludeFiled = ['page', 'limit', 'sort', 'Fields']
-    excludeFiled.forEach((Fieled) => delete queryStrigObj[Fieled])
-    console.log(queryStrigObj)
+    // =========================================================
+    // 1) Filtering
+    // =========================================================
 
-    // Pagination
+    // Copy query parameters from the request
+    const queryStringObj = { ...req.query };
+
+    // Exclude fields used for pagination, sorting, and field selection
+    const excludeFields = ["page", "limit", "sort", "fields"];
+
+    // Remove excluded fields from the filtering object
+    excludeFields.forEach((field) => delete queryStringObj[field]);
+
+    // =========================================================
+    // 2) Advanced Filtering
+    // =========================================================
+
+    // Convert MongoDB operators:
+    // gte -> $gte
+    // gt  -> $gt
+    // lte -> $lte
+    // lt  -> $lt
+    let queryStr = JSON.stringify(queryStringObj);
+
+    queryStr = queryStr.replace(
+        /\b(gte|gt|lte|lt)\b/g,
+        (match) => `$${match}`
+    );
+
+    // =========================================================
+    // 3) Pagination
+    // =========================================================
+
+    // Current page (default = 1)
     const page = req.query.page * 1 || 1;
+
+    // Number of products per page (default = 5)
     const limit = req.query.limit * 1 || 5;
+
+    // Number of documents to skip
     const skip = (page - 1) * limit;
 
-    // Get Products
-    const mongooseQuery = ProductModel.find(queryStrigObj).skip(skip).limit(limit);
-    const products = await mongooseQuery
+    // =========================================================
+    // 4) Build Query
+    // =========================================================
+
+    const mongooseQuery = ProductModel
+        .find(JSON.parse(queryStr))
+        .skip(skip)
+        .limit(limit);
+
+    // Execute query
+    const products = await mongooseQuery;
+
+    // =========================================================
+    // 5) Send Response
+    // =========================================================
 
     res.status(200).json({
         results: products.length,
@@ -38,9 +81,13 @@ exports.GetAllProducts = asyncHandler(async (req, res) => {
  */
 exports.GetProductByID = asyncHandler(async (req, res, next) => {
     const { id } = req.params;
+
     const product = await ProductModel.findById(id);
+
     if (!product) {
-        return next(new ApiError(`Product not found with ID: ${id}`, 404));
+        return next(
+            new ApiError(`Product not found with ID: ${id}`, 404)
+        );
     }
 
     res.status(200).json({
@@ -55,6 +102,7 @@ exports.GetProductByID = asyncHandler(async (req, res, next) => {
  * @access  Private
  */
 exports.CreateProduct = asyncHandler(async (req, res) => {
+    // Generate slug automatically from product title
     req.body.slug = slugify(req.body.title);
 
     const product = await ProductModel.create(req.body);
@@ -73,6 +121,7 @@ exports.CreateProduct = asyncHandler(async (req, res) => {
 exports.UpdateProductByID = asyncHandler(async (req, res, next) => {
     const { id } = req.params;
 
+    // Update slug if the product title is changed
     if (req.body.title) {
         req.body.slug = slugify(req.body.title);
     }
@@ -84,7 +133,9 @@ exports.UpdateProductByID = asyncHandler(async (req, res, next) => {
     );
 
     if (!product) {
-        return next(new ApiError(`Product not found with ID: ${id}`, 404));
+        return next(
+            new ApiError(`Product not found with ID: ${id}`, 404)
+        );
     }
 
     res.status(200).json({
@@ -101,10 +152,14 @@ exports.UpdateProductByID = asyncHandler(async (req, res, next) => {
 exports.DeleteProductByID = asyncHandler(async (req, res, next) => {
     const { id } = req.params;
 
-    const deletedProduct = await ProductModel.findOneAndDelete({ _id: id });
+    const deletedProduct = await ProductModel.findOneAndDelete({
+        _id: id,
+    });
 
     if (!deletedProduct) {
-        return next(new ApiError(`Product not found with ID: ${id}`, 404));
+        return next(
+            new ApiError(`Product not found with ID: ${id}`, 404)
+        );
     }
 
     res.status(200).json({

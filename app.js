@@ -15,6 +15,7 @@ const ProductRouter = require('./Routers/ProductRouter.cjs');
 const GlobalError = require('./middlewares/ErrorMiddleware.cjs');
 
 const app = express();
+app.set('query parser', 'extended');
 app.use(express.json());
 const Uri = process.env.MONGO_URI;
 const Port = process.env.PORT || 3000;
@@ -24,7 +25,7 @@ let server;
 // Handle Unhandled Promise Rejections
 process.on("unhandledRejection", (err) => {
     console.error(`UNHANDLED REJECTION!  ${err.name} : ${err.message}`);
-    // لو السيرفر قام واشتغل فعلاً، اقفله الأول بشكل نظيف قبل ما تقفل التطبيق
+    // لو السيرفر قام واشتغل فعلاً، اقفله الأول بشكل نظيف قبل ما تقفل التطبيق 
     if (server) {
         server.close(() => {
             console.error("Server shutting down...");

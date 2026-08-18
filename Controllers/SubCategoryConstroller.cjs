@@ -3,109 +3,183 @@ const asyncHandler = require("express-async-handler");
 const ApiError = require("../utils/ApiError.cjs");
 const slugify = require("slugify");
 
-exports.SetCategoryByID =  (req, res, next) => {
-    if (!req.body.category) req.body.category = req.params.categoryId
-    next()
-}
-exports.getSubcatByCategoryID =(req,res,next)=>{
-let categoryObject = {}
-    if (req.params.categoryId) categoryObject = { category: req.params.categoryId }
-    req.filterObj =categoryObject
-    next()
-}
+/**
+ * @desc    Set Category ID from URL parameter
+ * @usage   Used when creating a SubCategory under a specific Category
+ * @example POST /api/category/:categoryId/subcategories
+ */
+exports.SetCategoryByID = (req, res, next) => {
+    if (!req.body.category) {
+        req.body.category = req.params.categoryId;
+    }
+
+    next();
+};
+
+/**
+ * @desc    Set filter object based on Category ID
+ * @usage   Used to get SubCategories belonging to a specific Category
+ * @example GET /api/category/:categoryId/subcategories
+ */
+exports.getSubcatByCategoryID = (req, res, next) => {
+    let categoryObject = {};
+
+    if (req.params.categoryId) {
+        categoryObject = {
+            category: req.params.categoryId,
+        };
+    }
+
+    req.filterObj = categoryObject;
+
+    next();
+};
+
 /**
  * @desc    Get all Subcategories
- * @route   GET /api/Subcategories
+ * @route   GET /api/subcategories
  * @access  Public
  */
+exports.GetAllSubCategory = asyncHandler(async (req, res) => {
+    // =========================================================
+    // 1) Pagination
+    // =========================================================
 
-exports.GetAllSubCategory = asyncHandler(async (req, res,) => {
-
-
+    // Current page (default = 1)
     const page = req.query.page * 1 || 1;
+
+    // Number of SubCategories per page (default = 5)
     const limit = req.query.limit * 1 || 5;
-    const Skip = (page - 1) * limit
 
-    //  Get SubCategoryModel    
-    const SubCategories = await SubCategoryModel.find(req.filterObj).skip(Skip).limit(limit)
-    return res.status(200).json({
-        Results: SubCategories.length,
-        message: "SubCategories retrieved  Successfuly",
-        data: SubCategories
-    })
-})
+    // Number of documents to skip
+    const skip = (page - 1) * limit;
 
-/**
- * @desc    Get specific Subcategory by ID
- * @route   GET /api/ Subcategory/:id
- * @access  Public
- */
+    // =========================================================
+    // 2) Get SubCategories
+    // =========================================================
 
-exports.GetSubCategoryByID = asyncHandler(async (req, res, next) => {
-    const id = req.params.id
-    const SubCategory = await SubCategoryModel
-        .findById(id)
-    // .populate({path: "category",select : "name-_id"})
-    if (!SubCategory) {
-        return next(new ApiError(` Not Found this SubCategory By this ID ${id}`, 404))
-    }
+    const subCategories = await SubCategoryModel
+        .find(req.filterObj)
+        .skip(skip)
+        .limit(limit);
+
+    // =========================================================
+    // 3) Send Response
+    // =========================================================
+
     res.status(200).json({
-        message: "the SubCategory retrieved successfully",
-        data: SubCategory
-    })
-})
-
-/**
- * @desc    Create new Subcategory
- * @route   POST /api/Subcategory
- * @access  Private
- */
-exports.CreateSubCategory = asyncHandler(async (req, res) => {
-    const { name, category } = req.body;
-    const SubCategory = await SubCategoryModel.create({
-        name,
-        slug: slugify(name),
-        category,
-    });
-    res.status(201).json({
-        message: "Category Created Successfuly",
-        data: SubCategory,
+        results: subCategories.length,
+        message: "SubCategories retrieved successfully.",
+        data: subCategories,
     });
 });
 
 /**
- * @desc    update new Subcategory
- * @route   update /api/Subcategory
+ * @desc    Get specific SubCategory by ID
+ * @route   GET /api/subcategory/:id
+ * @access  Public
+ */
+exports.GetSubCategoryByID = asyncHandler(async (req, res, next) => {
+    const { id } = req.params;
+
+    const subCategory = await SubCategoryModel.findById(id);
+
+    if (!subCategory) {
+        return next(
+            new ApiError(
+                `SubCategory not found with ID: ${id}`,
+                404
+            )
+        );
+    }
+
+    res.status(200).json({
+        message: "SubCategory retrieved successfully.",
+        data: subCategory,
+    });
+});
+
+/**
+ * @desc    Create new SubCategory
+ * @route   POST /api/subcategory
+ * @access  Private
+ */
+exports.CreateSubCategory = asyncHandler(async (req, res) => {
+    const { name, category } = req.body;
+
+    // Generate slug automatically from SubCategory name
+    const subCategory = await SubCategoryModel.create({
+        name,
+        slug: slugify(name),
+        category,
+    });
+
+    res.status(201).json({
+        message: "SubCategory created successfully.",
+        data: subCategory,
+    });
+});
+
+/**
+ * @desc    Update specific SubCategory
+ * @route   PUT /api/subcategory/:id
  * @access  Private
  */
 exports.UpdateSubCategory = asyncHandler(async (req, res, next) => {
-    const { id } = req.params
-    const { name, category } = req.body
-    const SubCategory = await SubCategoryModel.findOneAndUpdate({ _id: id }, { name, slug: slugify(name), category }, { returnDocument: "after" })
-    if (!SubCategory) {
-        return next(new ApiError(` Not Found this Categroy By this ID ${id}`, 404))
+    const { id } = req.params;
+    const { name, category } = req.body;
+
+    // Update name, slug, and category
+    const subCategory = await SubCategoryModel.findOneAndUpdate(
+        { _id: id },
+        {
+            name,
+            slug: slugify(name),
+            category,
+        },
+        {
+            returnDocument: "after",
+        }
+    );
+
+    if (!subCategory) {
+        return next(
+            new ApiError(
+                `SubCategory not found with ID: ${id}`,
+                404
+            )
+        );
     }
+
     res.status(200).json({
-        message: "SubCategory Updated Successfuly",
-        data: SubCategory
-    })
-})
+        message: "SubCategory updated successfully.",
+        data: subCategory,
+    });
+});
 
 /**
- * @desc    Delete new Subcategory
- * @route   delete /api/Subcategory
+ * @desc    Delete specific SubCategory
+ * @route   DELETE /api/subcategory/:id
  * @access  Private
  */
 exports.DeleteSubCategory = asyncHandler(async (req, res, next) => {
-    const { id } = req.params
-    const SubCategory = await SubCategoryModel.findOneAndDelete({ _id: id })
-    if (!SubCategory) {
-        return next(new ApiError(` Not Found this Categroy By this ID ${id}`, 404))
+    const { id } = req.params;
+
+    const deletedSubCategory = await SubCategoryModel.findOneAndDelete({
+        _id: id,
+    });
+
+    if (!deletedSubCategory) {
+        return next(
+            new ApiError(
+                `SubCategory not found with ID: ${id}`,
+                404
+            )
+        );
     }
+
     res.status(200).json({
-        message: "SubCategory Deleted Successfuly",
-        data: SubCategory
-    })
-})
-
-
+        message: "SubCategory deleted successfully.",
+        data: deletedSubCategory,
+    });
+});
