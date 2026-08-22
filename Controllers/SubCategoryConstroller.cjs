@@ -31,7 +31,7 @@ exports.getSubcatByCategoryID = (req, res, next) => {
     }
 
     req.filterObj = categoryObject;
-
+    
     next();
 };
 
