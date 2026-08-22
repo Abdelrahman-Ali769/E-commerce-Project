@@ -17,7 +17,7 @@ exports.GetAllProducts = asyncHandler(async (req, res) => {
     const queryStringObj = { ...req.query };
 
     // Exclude fields used for pagination, sorting, and field selection
-    const excludeFields = ["page", "limit", "sort", "fields"];
+    const excludeFields = ["page", "limit", "sort", "fields","KeyWord"];
 
     // Remove excluded fields from the filtering object
     excludeFields.forEach((field) => delete queryStringObj[field]);
@@ -55,11 +55,35 @@ exports.GetAllProducts = asyncHandler(async (req, res) => {
     // 4) Build Query
     // =========================================================
 
-    const mongooseQuery = ProductModel
+    let mongooseQuery = ProductModel
         .find(JSON.parse(queryStr))
         .skip(skip)
         .limit(limit);
+    // sort 
+    if (req.query.sort) {
+        const sortBy = req.query.sort.split(",").join(" ");
+        mongooseQuery = mongooseQuery.sort(sortBy);
+    } else {
+        mongooseQuery = mongooseQuery.sort("-createdAt");
+    }
 
+    // Field limit by req.query.Fields
+
+    if (req.query.fields) {
+        const fields = req.query.fields.split(",").join(" ")
+        mongooseQuery = mongooseQuery.select(fields);
+    } else {
+        mongooseQuery = mongooseQuery.select('-_v');
+    }
+    // 5) Search    
+    if (req.query.KeyWord) {
+        const query = {}
+        query.$or = [
+            { title: { $regex: req.query.KeyWord, $options: 'i' } },
+            { description: { $regex: req.query.KeyWord, $options: 'i' } }
+        ]
+        mongooseQuery = mongooseQuery.find(query)
+    }
     // Execute query
     const products = await mongooseQuery;
 
