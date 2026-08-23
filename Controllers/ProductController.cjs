@@ -10,7 +10,7 @@ const slugify = require("slugify");
  * @access  Public
  */
 exports.GetAllProducts = asyncHandler(async (req, res) => {
-
+    const countDocument  = await ProductModel.countDocuments()
     const apiFeatures = new ApiFeatures(
         ProductModel.find(),
         req.query
@@ -19,12 +19,14 @@ exports.GetAllProducts = asyncHandler(async (req, res) => {
     .sort()
     .Fields()
     .Search()
-    .paginate()
+    .paginate(countDocument)
+    const {mongooseQuery,paginationResult} =apiFeatures
 
-    const products = await apiFeatures.mongooseQuery;
+    const products = await mongooseQuery;
 
     res.status(200).json({
         results: products.length,
+            paginationResult,
         message: "Products retrieved successfully.",
         data: products,
     });
