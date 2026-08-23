@@ -1,6 +1,7 @@
 const ProductModel = require("../Models/ProductSchema.cjs");
 const asyncHandler = require("express-async-handler");
 const ApiError = require("../utils/ApiError.cjs");
+const ApiFeatures = require("../utils/ApiFeatures.cjs");
 const slugify = require("slugify");
 
 /**
@@ -9,87 +10,18 @@ const slugify = require("slugify");
  * @access  Public
  */
 exports.GetAllProducts = asyncHandler(async (req, res) => {
-    // =========================================================
-    // 1) Filtering
-    // =========================================================
 
-    // Copy query parameters from the request
-    const queryStringObj = { ...req.query };
+    const apiFeatures = new ApiFeatures(
+        ProductModel.find(),
+        req.query
+    )
+    .filter()
+    .sort()
+    .Fields()
+    .Search()
+    .paginate()
 
-    // Exclude fields used for pagination, sorting, and field selection
-    const excludeFields = ["page", "limit", "sort", "fields","KeyWord"];
-
-    // Remove excluded fields from the filtering object
-    excludeFields.forEach((field) => delete queryStringObj[field]);
-
-    // =========================================================
-    // 2) Advanced Filtering
-    // =========================================================
-
-    // Convert MongoDB operators:
-    // gte -> $gte
-    // gt  -> $gt
-    // lte -> $lte
-    // lt  -> $lt
-    let queryStr = JSON.stringify(queryStringObj);
-
-    queryStr = queryStr.replace(
-        /\b(gte|gt|lte|lt)\b/g,
-        (match) => `$${match}`
-    );
-
-    // =========================================================
-    // 3) Pagination
-    // =========================================================
-
-    // Current page (default = 1)
-    const page = req.query.page * 1 || 1;
-
-    // Number of products per page (default = 5)
-    const limit = req.query.limit * 1 || 5;
-
-    // Number of documents to skip
-    const skip = (page - 1) * limit;
-
-    // =========================================================
-    // 4) Build Query
-    // =========================================================
-
-    let mongooseQuery = ProductModel
-        .find(JSON.parse(queryStr))
-        .skip(skip)
-        .limit(limit);
-    // sort 
-    if (req.query.sort) {
-        const sortBy = req.query.sort.split(",").join(" ");
-        mongooseQuery = mongooseQuery.sort(sortBy);
-    } else {
-        mongooseQuery = mongooseQuery.sort("-createdAt");
-    }
-
-    // Field limit by req.query.Fields
-
-    if (req.query.fields) {
-        const fields = req.query.fields.split(",").join(" ")
-        mongooseQuery = mongooseQuery.select(fields);
-    } else {
-        mongooseQuery = mongooseQuery.select('-_v');
-    }
-    // 5) Search    
-    if (req.query.KeyWord) {
-        const query = {}
-        query.$or = [
-            { title: { $regex: req.query.KeyWord, $options: 'i' } },
-            { description: { $regex: req.query.KeyWord, $options: 'i' } }
-        ]
-        mongooseQuery = mongooseQuery.find(query)
-    }
-    // Execute query
-    const products = await mongooseQuery;
-
-    // =========================================================
-    // 5) Send Response
-    // =========================================================
+    const products = await apiFeatures.mongooseQuery;
 
     res.status(200).json({
         results: products.length,
@@ -97,7 +29,6 @@ exports.GetAllProducts = asyncHandler(async (req, res) => {
         data: products,
     });
 });
-
 /**
  * @desc    Get specific Product by ID
  * @route   GET /api/Product/:id
