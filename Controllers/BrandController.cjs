@@ -1,6 +1,7 @@
 const BrandModel = require("../Models/BrandSchema.cjs");
 const asyncHandler = require("express-async-handler");
 const ApiError = require("../utils/ApiError.cjs");
+const ApiFeatures = require("../utils/ApiFeatures.cjs");
 const slugify = require("slugify");
 
 /**
@@ -9,37 +10,26 @@ const slugify = require("slugify");
  * @access  Public
  */
 exports.GetAllBrand = asyncHandler(async (req, res) => {
-    // =========================================================
-    // 1) Pagination
-    // =========================================================
+    const countDocument  = await BrandModel.countDocuments()
+        const apiFeatures = new ApiFeatures(
+            BrandModel.find(),
+            req.query
+        )
+        .filter()
+        .sort()
+        .Fields()
+        .Search()
+        .paginate(countDocument)
+        const {mongooseQuery,paginationResult} =apiFeatures
 
-    // Current page (default = 1)
-    const page = req.query.page * 1 || 1;
+        const Brands = await mongooseQuery;
 
-    // Number of brands per page (default = 5)
-    const limit = req.query.limit * 1 || 5;
-
-    // Number of documents to skip
-    const skip = (page - 1) * limit;
-
-    // =========================================================
-    // 2) Get Brands
-    // =========================================================
-
-    const brands = await BrandModel
-        .find({})
-        .skip(skip)
-        .limit(limit);
-
-    // =========================================================
-    // 3) Send Response
-    // =========================================================
-
-    res.status(200).json({
-        results: brands.length,
-        message: "Brands retrieved successfully.",
-        data: brands,
-    });
+        res.status(200).json({
+            results: Brands.length,
+                paginationResult,
+            message: "Brands retrieved successfully.",
+            data: Brands,
+        });
 });
 
 /**

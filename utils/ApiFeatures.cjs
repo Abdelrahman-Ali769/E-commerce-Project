@@ -6,7 +6,7 @@ class ApiFeatures {
     // filter
     filter() {
         const queryStringObj = { ...this.QueryString };
-        const excludeFields = ["page", "limit", "sort", "fields", "KeyWord"];
+        const excludeFields = ["page", "limit", "sort", "fields", "keyword"];
         excludeFields.forEach((field) => delete queryStringObj[field]);
         let queryStr = JSON.stringify(queryStringObj);
         queryStr = queryStr.replace(
@@ -37,13 +37,18 @@ class ApiFeatures {
         return this
     }
     //Search
-    Search() {
-        if (this.QueryString.KeyWord) {
-            const query = {}
-            query.$or = [
-                { title: { $regex: this.QueryString.KeyWord, $options: 'i' } },
-                { description: { $regex: this.QueryString.KeyWord, $options: 'i' } }
-            ]
+    Search(ModelName) {
+        if (this.QueryString.keyword) {
+            let query = {}
+            if (ModelName == "Products") {
+                query.$or = [
+                    { title: { $regex: this.QueryString.keyword, $options: 'i' } },
+                    { description: { $regex: this.QueryString.keyword, $options: 'i' } }
+                ]
+            } else {
+                query = { name: { $regex: this.QueryString.keyword, $options: 'i' } }
+            }
+
             this.mongooseQuery = this.mongooseQuery.find(query)
         }
         return this
