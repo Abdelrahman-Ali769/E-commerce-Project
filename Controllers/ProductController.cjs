@@ -1,7 +1,8 @@
 const ProductModel = require("../Models/ProductSchema.cjs");
 const asyncHandler = require("express-async-handler");
-const ApiError = require("../utils/ApiError.cjs");
 const ApiFeatures = require("../utils/ApiFeatures.cjs");
+ const factoryHandler =require('./FactoyHandlers.cjs')
+const ApiError = require("../utils/ApiError.cjs");
 const slugify = require("slugify");
 
 /**
@@ -106,21 +107,4 @@ exports.UpdateProductByID = asyncHandler(async (req, res, next) => {
  * @route   DELETE /api/Product/:id
  * @access  Private
  */
-exports.DeleteProductByID = asyncHandler(async (req, res, next) => {
-    const { id } = req.params;
-
-    const deletedProduct = await ProductModel.findOneAndDelete({
-        _id: id,
-    });
-
-    if (!deletedProduct) {
-        return next(
-            new ApiError(`Product not found with ID: ${id}`, 404)
-        );
-    }
-
-    res.status(200).json({
-        message: "Product deleted successfully.",
-        data: deletedProduct,
-    });
-});
+exports.DeleteProductByID = factoryHandler.DeleteOne(ProductModel)
