@@ -38,8 +38,8 @@ process.on("unhandledRejection", (err) => {
 // Mount Routers
 app.use('/api/category', CategoryRouter);
 app.use('/api/SubCategory',SubCategoryRouter );
-app.use('/api/Brand',BrandRouter );
 app.use('/api/Product',ProductRouter );
+app.use('/api/Brand',BrandRouter );
 
 // 404 Error Handler for Undefined Routes
 app.use((req, res, next) => {

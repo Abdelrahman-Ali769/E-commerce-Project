@@ -76,31 +76,7 @@ exports.CreateProduct = asyncHandler(async (req, res) => {
  * @route   PUT /api/Product/:id
  * @access  Private
  */
-exports.UpdateProductByID = asyncHandler(async (req, res, next) => {
-    const { id } = req.params;
-
-    // Update slug if the product title is changed
-    if (req.body.title) {
-        req.body.slug = slugify(req.body.title);
-    }
-
-    const product = await ProductModel.findOneAndUpdate(
-        { _id: id },
-        req.body,
-        { returnDocument: "after" }
-    );
-
-    if (!product) {
-        return next(
-            new ApiError(`Product not found with ID: ${id}`, 404)
-        );
-    }
-
-    res.status(200).json({
-        message: "Product updated successfully.",
-        data: product,
-    });
-});
+exports.UpdateProductByID = factoryHandler.UpdateOne(ProductModel)
 
 /**
  * @desc    Delete specific Product

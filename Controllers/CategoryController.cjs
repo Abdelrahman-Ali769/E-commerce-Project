@@ -83,36 +83,7 @@ exports.CreateCategory = asyncHandler(async (req, res) => {
  * @route   PUT /api/category/:id
  * @access  Private
  */
-exports.UpdateCategoryByID = asyncHandler(async (req, res, next) => {
-    const { id } = req.params;
-    const { name } = req.body;
-
-    // Update category name and regenerate slug
-    const category = await CategoryModel.findOneAndUpdate(
-        { _id: id },
-        {
-            name,
-            slug: slugify(name),
-        },
-        {
-            returnDocument: "after",
-        }
-    );
-
-    if (!category) {
-        return next(
-            new ApiError(
-                `Category not found with ID: ${id}`,
-                404
-            )
-        );
-    }
-
-    res.status(200).json({
-        message: "Category updated successfully.",
-        data: category,
-    });
-});
+exports.UpdateCategoryByID =factoryHandler.UpdateOne(CategoryModel)
 
 /**
  * @desc    Delete specific Category
