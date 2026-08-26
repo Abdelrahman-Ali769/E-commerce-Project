@@ -95,21 +95,7 @@ exports.GetSubCategoryByID = asyncHandler(async (req, res, next) => {
  * @route   POST /api/subcategory
  * @access  Private
  */
-exports.CreateSubCategory = asyncHandler(async (req, res) => {
-    const { name, category } = req.body;
-
-    // Generate slug automatically from SubCategory name
-    const subCategory = await SubCategoryModel.create({
-        name,
-        slug: slugify(name),
-        category,
-    });
-
-    res.status(201).json({
-        message: "SubCategory created successfully.",
-        data: subCategory,
-    });
-});
+exports.CreateSubCategory = factoryHandler.CreateOne(SubCategoryModel)
 
 /**
  * @desc    Update specific SubCategory

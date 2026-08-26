@@ -63,20 +63,7 @@ exports.GetCategoryByID = asyncHandler(async (req, res, next) => {
  * @route   POST /api/category
  * @access  Private
  */
-exports.CreateCategory = asyncHandler(async (req, res) => {
-    const { name } = req.body;
-
-    // Generate slug automatically from category name
-    const category = await CategoryModel.create({
-        name,
-        slug: slugify(name),
-    });
-
-    res.status(201).json({
-        message: "Category created successfully.",
-        data: category,
-    });
-});
+exports.CreateCategory = factoryHandler.CreateOne(CategoryModel)
 
 /**
  * @desc    Update specific Category

@@ -59,17 +59,7 @@ exports.GetProductByID = asyncHandler(async (req, res, next) => {
  * @route   POST /api/Product
  * @access  Private
  */
-exports.CreateProduct = asyncHandler(async (req, res) => {
-    // Generate slug automatically from product title
-    req.body.slug = slugify(req.body.title);
-
-    const product = await ProductModel.create(req.body);
-
-    res.status(201).json({
-        message: "Product created successfully.",
-        data: product,
-    });
-});
+exports.CreateProduct = factoryHandler.CreateOne(ProductModel)      
 
 /**
  * @desc    Update specific Product

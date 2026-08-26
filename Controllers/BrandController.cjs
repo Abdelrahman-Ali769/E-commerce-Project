@@ -63,20 +63,7 @@ exports.GetBrandByID = asyncHandler(async (req, res, next) => {
  * @route   POST /api/brand
  * @access  Private
  */
-exports.CreateBrand = asyncHandler(async (req, res) => {
-    const { name } = req.body;
-
-    // Generate slug automatically from Brand name
-    const brand = await BrandModel.create({
-        name,
-        slug: slugify(name),
-    });
-
-    res.status(201).json({
-        message: "Brand created successfully.",
-        data: brand,
-    });
-});
+exports.CreateBrand = factoryHandler.CreateOne(BrandModel)
 
 /**
  * @desc    Update specific Brand

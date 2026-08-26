@@ -16,19 +16,23 @@ exports.CreateSubCategoryValidator = [
         .isLength({ min: 2 })
         .withMessage("Too Short category name")
         .isLength({ max: 32 })
-        .withMessage("Too long category name"),
-        check('category').notEmpty().isMongoId().withMessage("Invalid Category ID Format"),
+        .withMessage("Too long category name")
+        .custom((val, { req }) => {
+            req.body.slug = slugify(val)
+            return true
+        }), 
+    check('category').notEmpty().isMongoId().withMessage("Invalid Category ID Format"),
     SubCategoryValidator
 ];
 
 //Update-Category-validator
 exports.UpdateSubCategoryValidator = [
     check("id").notEmpty().isMongoId().withMessage("Invalid Category ID Format "),
-    check("name").custom((val,{req})=>{
-        req.body.slug =slugify(val)
+    check("name").custom((val, { req }) => {
+        req.body.slug = slugify(val)
         return true
     })
-    
+
     ,
     SubCategoryValidator
 ];

@@ -47,4 +47,13 @@ exports.UpdateOne = (Model) => asyncHandler(async (req, res, next) => {
         data: Document,
     });
 });
+exports.CreateOne = (Model)=>asyncHandler(async (req, res) => {
+
+    // Generate slug automatically from Document name
+    const Document = await Model.create(req.body);
+    res.status(201).json({
+        message: "Document created successfully.",
+        data: Document,
+    });
+});
 

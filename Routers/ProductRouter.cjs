@@ -9,7 +9,6 @@ const { GetProductValidator
 
 const router = express.Router()
 
-
 // CRUD Operation From Product
 
 //GetAllProduct
