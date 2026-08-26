@@ -2,17 +2,17 @@ const asyncHandler = require("express-async-handler");
 const slugify = require("slugify");
 const ApiError = require("../utils/ApiError.cjs");
 
-exports.DeleteOne =(Model)=> asyncHandler(async (req, res, next) => {
-    const { id } = req.params;
+exports.DeleteOne = (Model) => asyncHandler(async (req, res, next) => {
 
-    const DeleteDocs = await Model.findOneAndDelete({
-        _id: id,
-    });
+
+    const DeleteDocs = await Model.findByIdAndDelete(
+        req.params.id
+    );
 
     if (!DeleteDocs) {
         return next(
             new ApiError(
-                `Document not found with ID: ${id}`,
+                `Document not found with ID: ${req.params.id}`,
                 404
             )
         );
@@ -22,17 +22,12 @@ exports.DeleteOne =(Model)=> asyncHandler(async (req, res, next) => {
         data: DeleteDocs,
     });
 })
-exports.UpdateOne =(Model)=>asyncHandler(async (req, res, next) => {
-    const { id } = req.params;
-    const { name } = req.body;
+exports.UpdateOne = (Model) => asyncHandler(async (req, res, next) => {
 
     // Update Document name and regenerate slug
-    const Document = await Model.findOneAndUpdate(
-        { _id: id },
-        {
-            name,
-            slug: slugify(name),
-        },
+    const Document = await Model.findByIdAndUpdate(
+        req.params.id,
+        req.body,
         {
             returnDocument: "after",
         }
@@ -41,7 +36,7 @@ exports.UpdateOne =(Model)=>asyncHandler(async (req, res, next) => {
     if (!Document) {
         return next(
             new ApiError(
-                `Document not found with ID: ${id}`,
+                `Document not found with ID: ${req.params.id}`,
                 404
             )
         );

@@ -1,4 +1,5 @@
 const { check } = require("express-validator");
+const slugify = require("slugify");
 const SubCategoryValidator = require("../../middlewares/validatorMiddleware.cjs");
 
 //Get-Spescific-Category
@@ -23,6 +24,12 @@ exports.CreateSubCategoryValidator = [
 //Update-Category-validator
 exports.UpdateSubCategoryValidator = [
     check("id").notEmpty().isMongoId().withMessage("Invalid Category ID Format "),
+    check("name").custom((val,{req})=>{
+        req.body.slug =slugify(val)
+        return true
+    })
+    
+    ,
     SubCategoryValidator
 ];
 
