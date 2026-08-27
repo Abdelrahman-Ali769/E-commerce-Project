@@ -38,25 +38,7 @@ exports.GetAllBrand = asyncHandler(async (req, res) => {
  * @route   GET /api/brand/:id
  * @access  Public
  */
-exports.GetBrandByID = asyncHandler(async (req, res, next) => {
-    const { id } = req.params;
-
-    const brand = await BrandModel.findById(id);
-
-    if (!brand) {
-        return next(
-            new ApiError(
-                `Brand not found with ID: ${id}`,
-                404
-            )
-        );
-    }
-
-    res.status(200).json({
-        message: "Brand retrieved successfully.",
-        data: brand,
-    });
-});
+exports.GetBrandByID = factoryHandler.GetOne(BrandModel)
 
 /**
  * @desc    Create new Brand

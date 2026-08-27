@@ -57,3 +57,19 @@ exports.CreateOne = (Model)=>asyncHandler(async (req, res) => {
     });
 });
 
+exports.GetOne = (Model)=>asyncHandler(async (req, res, next) => {
+
+    const Document = await Model.findById( req.params.id);
+
+    if (!Document) {
+        return next(
+            new ApiError(`Document not found with ID: ${ req.params.id}`, 404)
+        );
+    }
+
+    res.status(200).json({
+        message: "Document retrieved successfully.",
+        data: Document,
+    });
+});
+

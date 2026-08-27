@@ -38,25 +38,7 @@ exports.GetAllCategory = asyncHandler(async (req, res) => {
  * @route   GET /api/category/:id
  * @access  Public
  */
-exports.GetCategoryByID = asyncHandler(async (req, res, next) => {
-    const { id } = req.params;
-
-    const category = await CategoryModel.findById(id);
-
-    if (!category) {
-        return next(
-            new ApiError(
-                `Category not found with ID: ${id}`,
-                404
-            )
-        );
-    }
-
-    res.status(200).json({
-        message: "Category retrieved successfully.",
-        data: category,
-    });
-});
+exports.GetCategoryByID = factoryHandler.GetOne(CategoryModel)
 
 /**
  * @desc    Create new Category

@@ -37,22 +37,7 @@ exports.GetAllProducts = asyncHandler(async (req, res) => {
  * @route   GET /api/Product/:id
  * @access  Public
  */
-exports.GetProductByID = asyncHandler(async (req, res, next) => {
-    const { id } = req.params;
-
-    const product = await ProductModel.findById(id);
-
-    if (!product) {
-        return next(
-            new ApiError(`Product not found with ID: ${id}`, 404)
-        );
-    }
-
-    res.status(200).json({
-        message: "Product retrieved successfully.",
-        data: product,
-    });
-});
+exports.GetProductByID =  factoryHandler.GetOne(ProductModel)
 
 /**
  * @desc    Create new Product

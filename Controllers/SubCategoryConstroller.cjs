@@ -70,25 +70,7 @@ exports.GetAllSubCategory = asyncHandler(async (req, res) => {
  * @route   GET /api/subcategory/:id
  * @access  Public
  */
-exports.GetSubCategoryByID = asyncHandler(async (req, res, next) => {
-    const { id } = req.params;
-
-    const subCategory = await SubCategoryModel.findById(id);
-
-    if (!subCategory) {
-        return next(
-            new ApiError(
-                `SubCategory not found with ID: ${id}`,
-                404
-            )
-        );
-    }
-
-    res.status(200).json({
-        message: "SubCategory retrieved successfully.",
-        data: subCategory,
-    });
-});
+exports.GetSubCategoryByID = factoryHandler.GetOne(SubCategoryModel)
 
 /**
  * @desc    Create new SubCategory
