@@ -1,37 +1,13 @@
 const ProductModel = require("../Models/ProductSchema.cjs");
-const asyncHandler = require("express-async-handler");
-const ApiFeatures = require("../utils/ApiFeatures.cjs");
- const factoryHandler =require('./FactoyHandlers.cjs')
-const ApiError = require("../utils/ApiError.cjs");
-const slugify = require("slugify");
+const factoryHandler =require('./FactoyHandlers.cjs')
+
 
 /**
  * @desc    Get all Products
  * @route   GET /api/Product
  * @access  Public
  */
-exports.GetAllProducts = asyncHandler(async (req, res) => {
-    const countDocument  = await ProductModel.countDocuments()
-    const apiFeatures = new ApiFeatures(
-        ProductModel.find(),
-        req.query
-    )
-    .filter()
-    .sort()
-    .Fields()
-    .Search('Products')
-    .paginate(countDocument)
-    const {mongooseQuery,paginationResult} =apiFeatures
-
-    const products = await mongooseQuery;
-
-    res.status(200).json({
-        results: products.length,
-            paginationResult,
-        message: "Products retrieved successfully.",
-        data: products,
-    });
-});
+exports.GetAllProducts = factoryHandler.GetAll(ProductModel)
 /**
  * @desc    Get specific Product by ID
  * @route   GET /api/Product/:id

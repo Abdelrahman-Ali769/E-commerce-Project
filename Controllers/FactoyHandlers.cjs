@@ -1,6 +1,6 @@
 const asyncHandler = require("express-async-handler");
-const slugify = require("slugify");
 const ApiError = require("../utils/ApiError.cjs");
+const ApiFeatures = require("../utils/ApiFeatures.cjs");
 
 exports.DeleteOne = (Model) => asyncHandler(async (req, res, next) => {
 
@@ -71,5 +71,27 @@ exports.GetOne = (Model)=>asyncHandler(async (req, res, next) => {
         message: "Document retrieved successfully.",
         data: Document,
     });
+});
+exports.GetAll = (Model)=>asyncHandler(async (req, res) => {
+    const countDocument  = await Model.countDocuments()
+        const apiFeatures = new ApiFeatures(
+            Model.find(),
+            req.query
+        )
+        .filter()
+        .sort()
+        .Fields()
+        .Search()
+        .paginate(countDocument)
+        const {mongooseQuery,paginationResult} =apiFeatures
+
+        const Document = await mongooseQuery;
+
+        res.status(200).json({
+            results: Document.length,
+                paginationResult,
+            message: "Document retrieved successfully.",
+            data: Document,
+        });
 });
 

@@ -1,37 +1,12 @@
 const BrandModel = require("../Models/BrandSchema.cjs");
-const asyncHandler = require("express-async-handler");
-const ApiFeatures = require("../utils/ApiFeatures.cjs");
 const factoryHandler =require('./FactoyHandlers.cjs')
-const ApiError = require("../utils/ApiError.cjs");
-const slugify = require("slugify");
 
 /**
  * @desc    Get all Brands
  * @route   GET /api/brand
  * @access  Public
  */
-exports.GetAllBrand = asyncHandler(async (req, res) => {
-    const countDocument  = await BrandModel.countDocuments()
-        const apiFeatures = new ApiFeatures(
-            BrandModel.find(),
-            req.query
-        )
-        .filter()
-        .sort()
-        .Fields()
-        .Search()
-        .paginate(countDocument)
-        const {mongooseQuery,paginationResult} =apiFeatures
-
-        const Brands = await mongooseQuery;
-
-        res.status(200).json({
-            results: Brands.length,
-                paginationResult,
-            message: "Brands retrieved successfully.",
-            data: Brands,
-        });
-});
+exports.GetAllBrand = factoryHandler.GetAll(BrandModel)
 
 /**
  * @desc    Get specific Brand by ID

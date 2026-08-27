@@ -1,9 +1,5 @@
 const SubCategoryModel = require("../Models/SubCategorySchema.cjs");
-const asyncHandler = require("express-async-handler");
-const ApiFeatures = require("../utils/ApiFeatures.cjs");
- const factoryHandler =require('./FactoyHandlers.cjs')
-const ApiError = require("../utils/ApiError.cjs");
-const slugify = require("slugify");
+const factoryHandler =require('./FactoyHandlers.cjs')
 
 /**
  * @desc    Set Category ID from URL parameter
@@ -42,28 +38,7 @@ exports.getSubcatByCategoryID = (req, res, next) => {
  * @route   GET /api/subcategories
  * @access  Public
  */
-exports.GetAllSubCategory = asyncHandler(async (req, res) => {
-    const countDocument  = await SubCategoryModel.countDocuments()
-    const apiFeatures = new ApiFeatures(
-        SubCategoryModel.find(),
-        req.query
-    )
-    .filter()
-    .sort()
-    .Fields()
-    .Search()
-    .paginate(countDocument)
-    const {mongooseQuery,paginationResult} =apiFeatures
-
-    const SubCategories = await mongooseQuery;
-
-    res.status(200).json({
-        results: SubCategories.length,
-            paginationResult,
-        message: "SubCategories retrieved successfully.",
-        data: SubCategories,
-    });
-});
+exports.GetAllSubCategory =factoryHandler.GetAll(SubCategoryModel)
 
 /**
  * @desc    Get specific SubCategory by ID
