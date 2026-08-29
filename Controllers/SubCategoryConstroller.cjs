@@ -2,7 +2,7 @@ const SubCategoryModel = require("../Models/SubCategorySchema.cjs");
 const factoryHandler =require('./FactoyHandlers.cjs')
 
 /**
- * @desc    Set Category ID from URL parameter
+ * @desc    Set Category ID from URL paramet Werhere We want  Create
  * @usage   Used when creating a SubCategory under a specific Category
  * @example POST /api/category/:categoryId/subcategories
  */
@@ -10,12 +10,11 @@ exports.SetCategoryByID = (req, res, next) => {
     if (!req.body.category) {
         req.body.category = req.params.categoryId;
     }
-
     next();
 };
 
 /**
- * @desc    Set filter object based on Category ID
+ * @desc    Set filter object based on Category ID Where We want Get 
  * @usage   Used to get SubCategories belonging to a specific Category
  * @example GET /api/category/:categoryId/subcategories
  */
@@ -27,7 +26,6 @@ exports.getSubcatByCategoryID = (req, res, next) => {
             category: req.params.categoryId,
         };
     }
-
     req.filterObj = categoryObject;
     
     next();

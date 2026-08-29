@@ -59,6 +59,7 @@ exports.CreateOne = (Model)=>asyncHandler(async (req, res) => {
 
 exports.GetOne = (Model)=>asyncHandler(async (req, res, next) => {
 
+
     const Document = await Model.findById( req.params.id);
 
     if (!Document) {
@@ -72,16 +73,20 @@ exports.GetOne = (Model)=>asyncHandler(async (req, res, next) => {
         data: Document,
     });
 });
-exports.GetAll = (Model)=>asyncHandler(async (req, res) => {
-    const countDocument  = await Model.countDocuments()
+exports.GetAll = (Model,modelName=' ')=>asyncHandler(async (req, res) => {
+    let filter ={}
+    if(req.filterObj){
+        filter=req.filterObj
+    }
+    const countDocument  = await Model.countDocuments(filter)
         const apiFeatures = new ApiFeatures(
-            Model.find(),
+            Model.find(filter),
             req.query
         )
         .filter()
         .sort()
         .Fields()
-        .Search()
+        .Search(modelName)
         .paginate(countDocument)
         const {mongooseQuery,paginationResult} =apiFeatures
 

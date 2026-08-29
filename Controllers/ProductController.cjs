@@ -7,7 +7,7 @@ const factoryHandler =require('./FactoyHandlers.cjs')
  * @route   GET /api/Product
  * @access  Public
  */
-exports.GetAllProducts = factoryHandler.GetAll(ProductModel)
+exports.GetAllProducts = factoryHandler.GetAll(ProductModel,'Products')
 /**
  * @desc    Get specific Product by ID
  * @route   GET /api/Product/:id
