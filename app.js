@@ -4,6 +4,7 @@ process.on("uncaughtException", (err) => {
     process.exit(1);
 });
 
+
 require("dotenv").config();
 const express = require("express");
 const ApiError = require("./utils/ApiError.cjs");
