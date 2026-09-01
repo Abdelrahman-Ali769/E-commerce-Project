@@ -1,5 +1,5 @@
 const express = require('express')
-const CategoryController = require('../Controllers/CategoryController.cjs')
+const { GetAllCategory, GetCategoryByID, CreateCategory, UpdateCategoryByID, DeleteCategoryByID, uploadCategoryImage } = require('../Controllers/CategoryController.cjs')
 const { getCategoryValidator
     , CreateCategoryValidator
     , UpdateCategoryValidator
@@ -15,19 +15,19 @@ const router = express.Router()
 // CRUD Operation From Category
 
 //GetAllCategory
-router.get('/', CategoryController.GetAllCategory)
+router.get('/', GetAllCategory)
 
 //GetCategoryByID
-router.get('/:id', getCategoryValidator, CategoryController.GetCategoryByID)
+router.get('/:id', getCategoryValidator, GetCategoryByID)
 
 //CreateCategory
-router.post('/', CreateCategoryValidator, CategoryController.CreateCategory)
+router.post('/', uploadCategoryImage,CreateCategoryValidator, CreateCategory)
 
 //UpdateCategoryByID
-router.put('/:id', UpdateCategoryValidator, CategoryController.UpdateCategoryByID)
+router.put('/:id', UpdateCategoryValidator, UpdateCategoryByID)
 
 //DeleteCategoryByID
-router.delete('/:id', DeleteCategoryValidator, CategoryController.DeleteCategoryByID)
+router.delete('/:id', DeleteCategoryValidator, DeleteCategoryByID)
 
 router.use('/:categoryId/subcategories', subcategoriesRouter)
 

@@ -1,12 +1,35 @@
 const CategoryModel = require("../Models/CategorySchema.cjs");
-const factoryHandler = require('./FactoyHandlers.cjs')
+const factoryHandler = require("./FactoyHandlers.cjs");
+const multer = require('multer');
+const { v4: uuidv4 } = require('uuid');
 
+
+
+const multerStorage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'uploads/categories');
+    },
+
+    filename: function (req, file, cb) {
+        const ext = file.mimetype.split('/')[1];
+        const filename = `category-${uuidv4()}-${Date.now()}.${ext}`;
+        cb(null, filename);
+    },
+});
+
+const upload = multer({
+    storage: multerStorage
+});
+
+// 3- Export upload middleware
+exports.uploadCategoryImage = upload.single("image");
 
 /**
  * @desc    Get all Categories
  * @route   GET /api/category
  * @access  Public
  */
+
 exports.GetAllCategory = factoryHandler.GetAll(CategoryModel)
 
 /**
@@ -28,7 +51,7 @@ exports.CreateCategory = factoryHandler.CreateOne(CategoryModel)
  * @route   PUT /api/category/:id
  * @access  Private
  */
-exports.UpdateCategoryByID =factoryHandler.UpdateOne(CategoryModel)
+exports.UpdateCategoryByID = factoryHandler.UpdateOne(CategoryModel)
 
 /**
  * @desc    Delete specific Category
