@@ -3,26 +3,21 @@ const factoryHandler = require("./FactoyHandlers.cjs");
 const multer = require('multer');
 const { v4: uuidv4 } = require('uuid');
 
-
-
-const multerStorage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, 'uploads/categories');
+const MulterStorage =multer.diskStorage({
+    destination: function(req,file,cb){
+        cb(null,"uploads/categories")
     },
-
-    filename: function (req, file, cb) {
-        const ext = file.mimetype.split('/')[1];
-        const filename = `category-${uuidv4()}-${Date.now()}.${ext}`;
+    filename :function(req,file,cb){
+        console.log(req.file)
+        const ext =file.mimetype.split('/')[1]
+        const filename =`catgory-${uuidv4()}-${Date.now()}.${ext}`
         cb(null, filename);
-    },
-});
-
+    }
+})
 const upload = multer({
-    storage: multerStorage
-});
-
-// 3- Export upload middleware
-exports.uploadCategoryImage = upload.single("image");
+    storage : MulterStorage
+})
+exports.uploadCategoryImage = upload.single("image")
 
 /**
  * @desc    Get all Categories
