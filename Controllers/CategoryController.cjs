@@ -16,10 +16,10 @@ const MulterStorage = multer.diskStorage({
     }
 })
 const MulterFilter = function (req, file, cb) {
-    // تحقق من الامتداد بس (extension)
+    // Check images Extination
     const allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
     const fileExtension = file.originalname.split('.').pop().toLowerCase();
-    
+
     if (allowedExtensions.includes(fileExtension)) {
         cb(null, true);
     } else {
