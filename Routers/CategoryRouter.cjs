@@ -1,5 +1,5 @@
 const express = require('express')
-const { GetAllCategory, GetCategoryByID, CreateCategory, UpdateCategoryByID, DeleteCategoryByID, uploadCategoryImage } = require('../Controllers/CategoryController.cjs')
+const { GetAllCategory, GetCategoryByID, CreateCategory, UpdateCategoryByID, DeleteCategoryByID, uploadCategoryImage,ResizeImages } = require('../Controllers/CategoryController.cjs')
 const { getCategoryValidator
     , CreateCategoryValidator
     , UpdateCategoryValidator
@@ -21,7 +21,7 @@ router.get('/', GetAllCategory)
 router.get('/:id', getCategoryValidator, GetCategoryByID)
 
 //CreateCategory
-router.post('/', uploadCategoryImage,CreateCategoryValidator, CreateCategory)
+router.post('/', uploadCategoryImage,ResizeImages,CreateCategoryValidator, CreateCategory)
 
 //UpdateCategoryByID
 router.put('/:id', UpdateCategoryValidator, UpdateCategoryByID)
