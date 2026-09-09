@@ -7,6 +7,7 @@ process.on("uncaughtException", (err) => {
 
 require("dotenv").config();
 const express = require("express");
+const path =require('path')
 const ApiError = require("./utils/ApiError.cjs");
 const GlobalError = require("./middlewares/ErrorMiddleware.cjs");
 const CategoryRouter = require("./Routers/CategoryRouter.cjs");
@@ -25,6 +26,7 @@ let server;
 
 app.set("query parser", "extended");
 app.use(express.json());
+app.use('/uploads',express.static(path.join(__dirname ,"uploads")))
 
 
 // Routes

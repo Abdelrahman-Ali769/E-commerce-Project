@@ -24,7 +24,7 @@ router.get('/:id', getCategoryValidator, GetCategoryByID)
 router.post('/', uploadCategoryImage,ResizeImages,CreateCategoryValidator, CreateCategory)
 
 //UpdateCategoryByID
-router.put('/:id', UpdateCategoryValidator, UpdateCategoryByID)
+router.put('/:id',uploadCategoryImage,ResizeImages,UpdateCategoryValidator, UpdateCategoryByID)
 
 //DeleteCategoryByID
 router.delete('/:id', DeleteCategoryValidator, DeleteCategoryByID)

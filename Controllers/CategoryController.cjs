@@ -53,7 +53,7 @@ exports.ResizeImages = asyncHandler(async (req, res, next) => {
         .toFormat("jpeg") // Convert image to JPEG
         .jpeg({ quality: 95 }) // Reduce quality to save space
         .toFile(`uploads/categories/${filename}`); // Save image
-
+            req.body.image =filename 
     next();
 });
 
