@@ -1,5 +1,5 @@
 const express = require('express')
-const {GetAllBrand,GetBrandByID,CreateBrand,UpdateBrandByID,DeleteBrandByID} = require('../Controllers/BrandController.cjs')
+const {GetAllBrand,GetBrandByID,CreateBrand,UpdateBrandByID,DeleteBrandByID,uploadBrandImage,ResizeImages} = require('../Controllers/BrandController.cjs')
 const { getBrandValidator
     , CreateBrandValidator
     , UpdateBrandValidator
@@ -20,10 +20,10 @@ router.get('/', GetAllBrand)
 router.get('/:id', getBrandValidator, GetBrandByID)
 
 //CreateBrand
-router.post('/', CreateBrandValidator, CreateBrand)
+router.post('/', uploadBrandImage,ResizeImages,CreateBrandValidator, CreateBrand)
 
 //UpdateBrandByID
-router.put('/:id', UpdateBrandValidator, UpdateBrandByID)
+router.put('/:id',uploadBrandImage,ResizeImages,UpdateBrandValidator, UpdateBrandByID)
 
 //DeleteBrandByID
 router.delete('/:id', DeleteBrandValidator, DeleteBrandByID)

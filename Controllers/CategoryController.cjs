@@ -1,45 +1,14 @@
 const CategoryModel = require("../Models/CategorySchema.cjs");
 const asyncHandler = require("express-async-handler");
-const ApiError = require("../utils/ApiError.cjs");
 const factoryHandler = require("./FactoyHandlers.cjs");
 const sharp = require("sharp");
-const multer = require("multer");
+const {uploadSingleImage} =require('../middlewares/SingleImageMiddleware.cjs')
 const { v4: uuidv4 } = require("uuid");
 
-// const MulterStorage = multer.diskStorage({
-//     destination: function (req, file, cb) {
-//         cb(null, "uploads/categories");
-//     },
-//     filename: function (req, file, cb) {
-//         const ext = file.mimetype.split("/")[1];
-//         const filename = `category-${uuidv4()}-${Date.now()}.${ext}`;
-//         cb(null, filename);
-//     }
-// });
 
-const MulterStorage = multer.memoryStorage();
 
-const MulterFilter = function (req, file, cb) {
-    // Check image extension
-    const allowedExtensions = ["jpg", "jpeg", "png", "gif", "webp"];
-    const fileExtension = file.originalname
-        .split(".")
-        .pop()
-        .toLowerCase();
 
-    if (allowedExtensions.includes(fileExtension)) {
-        cb(null, true);
-    } else {
-        cb(new ApiError("Only Images Allowed", 400), false);
-    }
-};
-
-const upload = multer({
-    storage: MulterStorage,
-    fileFilter: MulterFilter
-});
-
-exports.uploadCategoryImage = upload.single("image");
+exports.uploadCategoryImage = uploadSingleImage("image")
 
 exports.ResizeImages = asyncHandler(async (req, res, next) => {
     const filename = `category-${uuidv4()}-${Date.now()}.jpeg`;
