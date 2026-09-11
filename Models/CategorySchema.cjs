@@ -12,11 +12,31 @@ const CategorySchema = new Schema({
         type: String,
         lowercase: true
     },
-    image : {
-        type:String
+    image: {
+        type: String
     }
 }, { timestamps: true })
 
-module.exports = mongoose.model('Category', CategorySchema)
+CategorySchema.virtual("imageUrl").get(function () {
+    if (!this.image) return null;
+
+    return `${process.env.BASE_URL}/uploads/categories/${this.image}`;
+});
+
+const responseOptions = {
+    virtuals: true,
+    versionKey: false,
+
+    transform: (doc, response) => {
+        delete response._id;
+        return response;
+    },
+};
+
+CategorySchema.set("toJSON", responseOptions);
+CategorySchema.set("toObject", responseOptions);
+
+module.exports = mongoose.model("Category", CategorySchema);
+
 
 
