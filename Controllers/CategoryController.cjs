@@ -2,7 +2,7 @@ const CategoryModel = require("../Models/CategorySchema.cjs");
 const asyncHandler = require("express-async-handler");
 const factoryHandler = require("./FactoyHandlers.cjs");
 const sharp = require("sharp");
-const {uploadSingleImage} =require('../middlewares/SingleImageMiddleware.cjs')
+const {uploadSingleImage} =require('../middlewares/ImageMiddleware.cjs')
 const { v4: uuidv4 } = require("uuid");
 
 

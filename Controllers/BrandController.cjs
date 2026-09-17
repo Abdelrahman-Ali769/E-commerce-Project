@@ -2,7 +2,7 @@ const BrandModel = require("../Models/BrandSchema.cjs");
 const factoryHandler =require('./FactoyHandlers.cjs')
 const asyncHandler = require("express-async-handler");
 const sharp = require("sharp");
-const {uploadSingleImage} =require('../middlewares/SingleImageMiddleware.cjs')
+const {uploadSingleImage} =require('../middlewares/ImageMiddleware.cjs')
 const { v4: uuidv4 } = require("uuid");
 
 

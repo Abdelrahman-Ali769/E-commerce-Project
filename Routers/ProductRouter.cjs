@@ -5,7 +5,7 @@ const {
     CreateProduct,
     UpdateProductByID,
     DeleteProductByID,
-    uploadProductImage,
+    uploadProductImages,
     resizeProductImages,
 } = require("../Controllers/ProductController.cjs");
 const {
@@ -28,7 +28,7 @@ router.get("/:id", GetProductValidator, GetProductByID);
 //CreateProduct
 router.post(
     "/",
-    uploadProductImage,
+    uploadProductImages,
     resizeProductImages,
     CreateProductValidator,
     CreateProduct,
@@ -37,7 +37,7 @@ router.post(
 //UpdateProductByID
 router.put(
     "/:id",
-    uploadProductImage,
+    uploadProductImages,
     resizeProductImages,
     UpdateProductValidator,
     UpdateProductByID,

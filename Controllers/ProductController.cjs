@@ -1,36 +1,15 @@
 const ProductModel = require("../Models/ProductSchema.cjs");
-const factoryHandler =require('./FactoyHandlers.cjs')
-const ApiError = require("../utils/ApiError.cjs");
-const multer = require("multer");
+const factoryHandler = require('./FactoyHandlers.cjs')
+const {uploadMixOfImages} =require("../middlewares/ImageMiddleware.cjs")
 const asyncHandler = require("express-async-handler");
 const sharp = require("sharp");
 const { v4: uuidv4 } = require("uuid");
 
 
 
-    const MulterStorage = multer.memoryStorage();
-    
-    const MulterFilter = function (req, file, cb) {
-        // Check image extension
-        const allowedExtensions = ["jpg", "jpeg", "png", "gif", "webp"];
-        const fileExtension = file.originalname
-            .split(".")
-            .pop()
-            .toLowerCase();
-    
-        if (allowedExtensions.includes(fileExtension)) {
-            cb(null, true);
-        } else {
-            cb(new ApiError("Only Images Allowed", 400), false);
-        }
-    };
-    
-    const upload = multer({
-        storage: MulterStorage,
-        fileFilter: MulterFilter
-    });
 
-exports.uploadProductImage = upload.fields([
+
+exports.uploadProductImages = uploadMixOfImages([
     {
         name: 'imageCover',
         maxCount: 1,
@@ -38,7 +17,7 @@ exports.uploadProductImage = upload.fields([
     {
         name: 'images',
         maxCount: 5,
-    }
+    },
 ]);
 exports.resizeProductImages = asyncHandler(async (req, res, next) => {
 
@@ -96,20 +75,20 @@ exports.resizeProductImages = asyncHandler(async (req, res, next) => {
  * @route   GET /api/Product
  * @access  Public
  */
-exports.GetAllProducts = factoryHandler.GetAll(ProductModel,'Products')
+exports.GetAllProducts = factoryHandler.GetAll(ProductModel, 'Products')
 /**
  * @desc    Get specific Product by ID
  * @route   GET /api/Product/:id
  * @access  Public
  */
-exports.GetProductByID =  factoryHandler.GetOne(ProductModel)
+exports.GetProductByID = factoryHandler.GetOne(ProductModel)
 
 /**
  * @desc    Create new Product
  * @route   POST /api/Product
  * @access  Private
  */
-exports.CreateProduct = factoryHandler.CreateOne(ProductModel)      
+exports.CreateProduct = factoryHandler.CreateOne(ProductModel)
 
 /**
  * @desc    Update specific Product
