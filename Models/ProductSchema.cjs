@@ -106,9 +106,47 @@ ProductSchema.pre(/^find/, function () {
     this.populate([
         {
             path: 'category',
-            select: 'name -_id'
+            select: 'name'
         }
     ]);
 });
+const responseOptions = {
+    virtuals: true,
+    versionKey: false,
+
+    transform: (doc, response) => {
+
+        // Remove MongoDB _id
+        delete response._id;
+
+        // Convert imageCover to full URL
+        if (response.imageCover) {
+            response.imageCover =
+                `${process.env.BASE_URL}/uploads/products/${response.imageCover}`;
+        }
+
+        // Convert images to full URLs
+        if (response.images && response.images.length > 0) {
+            response.images = response.images.map(
+                (image) =>
+                    `${process.env.BASE_URL}/uploads/products/${image}`
+            );
+        }
+
+        // Format ratings
+        response.ratings = {
+            average: response.ratingsAverage,
+            quantity: response.ratingsQuantity,
+        };
+
+        delete response.ratingsAverage;
+        delete response.ratingsQuantity;
+
+        return response;
+    },
+};
+
+ProductSchema.set("toJSON", responseOptions);
+ProductSchema.set("toObject", responseOptions);
 
 module.exports = mongoose.model("Product", ProductSchema);
