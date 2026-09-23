@@ -53,6 +53,19 @@ exports.CreateUserValidator = [
         .withMessage("Password must be at least 6 characters"),
 
 
+
+    // password Confirm
+    check("passwordConfirm")
+        .notEmpty()
+        .withMessage("Password Confirm is required")
+        .custom((val, { req }) => {
+            if (val !== req.body.password) {
+                throw new Error("Password confirmation does not match password");
+            }
+            return true;
+        }),
+
+
     // Role
     check("role")
         .optional()
