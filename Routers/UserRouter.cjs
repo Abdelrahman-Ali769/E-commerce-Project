@@ -11,52 +11,77 @@ const {
     ResizeImages
 } = require("../Controllers/UserController.cjs");
 
-// const {
-//     getUserValidator,
-//     CreateUserValidator,
-//     UpdateUserValidator,
-//     DeleteUserValidator
-// } = require("../utils/validators/UserValidator.cjs");
+const {
+    GetUserValidator,
+    CreateUserValidator,
+    UpdateUserValidator,
+    DeactivateUserValidator
+} = require("../utils/validators/UserValidator.cjs");
 
 const router = express.Router();
 
 
 // CRUD Operations From User
 
-// GetAllUser
+// ==================== Get All Users ====================
+// GET /api/users
+// Get all active users
 // Private
-router.get("/", GetAllUser);
+
+router.get(
+    "/",
+    GetAllUser
+);
 
 
-// GetUserByID
+// ==================== Get User By ID ====================
+// GET /api/users/:id
+// Get a specific user by ID
 // Private
-router.get("/:id", GetUserByID);
+
+router.get(
+    "/:id",
+    GetUserValidator,
+    GetUserByID
+);
 
 
-// CreateUser
+// ==================== Create User ====================
+// POST /api/users
+// Create a new user
 // Private
+
 router.post(
     "/",
     uploadUserImage,
     ResizeImages,
+    CreateUserValidator,
     CreateUser
 );
 
 
-// UpdateUserByID
+// ==================== Update User ====================
+// PUT /api/users/:id
+// Update a specific user by ID
 // Private
+
 router.put(
     "/:id",
     uploadUserImage,
     ResizeImages,
+    UpdateUserValidator,
     UpdateUserByID
 );
 
 
-// DeleteUserByID
+// ==================== Deactivate User ====================
+// DELETE /api/users/:id
+// Deactivate a specific user by ID (Soft Delete)
 // Private
-router.delete("/:id", DeactivateUserByID);
 
-
-module.exports = router;
-
+router.delete(
+    "/:id",
+    DeactivateUserValidator,
+    DeactivateUserByID
+);
+module.exports = router
