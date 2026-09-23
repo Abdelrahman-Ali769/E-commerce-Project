@@ -1,7 +1,8 @@
 
 const UserModel = require("../Models/UserSchema.cjs");
 const factoryHandler = require("./FactoyHandlers.cjs");
-const asyncHandler = require("express-async-handler");
+const asyncHandler = require("express-async-handler"); 
+const ApiError = require('../utils/ApiError.cjs')
 const sharp = require("sharp");
 const { uploadSingleImage } = require("../middlewares/ImageMiddleware.cjs");
 const { v4: uuidv4 } = require("uuid");
@@ -33,7 +34,10 @@ exports.ResizeImages = asyncHandler(async (req, res, next) => {
  * @route   GET /api/users
  * @access  Private
  */
-exports.GetAllUser = factoryHandler.GetAll(UserModel);
+exports.GetAllUser = asyncHandler(async(req,res,next)=>{
+    req.filterObj = {active:  true} 
+    return factoryHandler.GetAll(UserModel)(req,res,next);
+})
 
 /**
  * @desc    Get specific User by ID
@@ -57,9 +61,19 @@ exports.CreateUser = factoryHandler.CreateOne(UserModel);
 exports.UpdateUserByID = factoryHandler.UpdateOne(UserModel);
 
 /**
- * @desc    Delete specific User
- * @route   DELETE /api/users/:id
+ * @desc    deactivated specific User
+ * @route   DELETE  /api/users/:id
  * @access  Private
  */
-exports.DeleteUserByID = factoryHandler.DeleteOne(UserModel);
+exports.DeactivateUserByID = asyncHandler(async (req, res, next) => {
+    const User = await UserModel.findByIdAndUpdate(req.params.id, { active: false }, { returnDocument: "after" })
+    if (!User) {
+        return next(new ApiError("User not found", 404));
+    }
+    res.status(200).json({
+        message: "User deactivated successfully",
+        data: User
+    })
+
+})
 

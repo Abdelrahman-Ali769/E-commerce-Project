@@ -6,7 +6,7 @@ const {
     GetUserByID,
     CreateUser,
     UpdateUserByID,
-    DeleteUserByID,
+    DeactivateUserByID,
     uploadUserImage,
     ResizeImages
 } = require("../Controllers/UserController.cjs");
@@ -55,7 +55,7 @@ router.put(
 
 // DeleteUserByID
 // Private
-router.delete("/:id", DeleteUserByID);
+router.delete("/:id", DeactivateUserByID);
 
 
 module.exports = router;
