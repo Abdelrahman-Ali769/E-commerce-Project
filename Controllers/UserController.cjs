@@ -1,7 +1,7 @@
 
 const UserModel = require("../Models/UserSchema.cjs");
 const factoryHandler = require("./FactoyHandlers.cjs");
-const asyncHandler = require("express-async-handler"); 
+const asyncHandler = require("express-async-handler");
 const ApiError = require('../utils/ApiError.cjs')
 const sharp = require("sharp");
 const { uploadSingleImage } = require("../middlewares/ImageMiddleware.cjs");
@@ -34,9 +34,9 @@ exports.ResizeImages = asyncHandler(async (req, res, next) => {
  * @route   GET /api/users
  * @access  Private
  */
-exports.GetAllUser = asyncHandler(async(req,res,next)=>{
-    req.filterObj = {active:  true} 
-    return factoryHandler.GetAll(UserModel)(req,res,next);
+exports.GetAllUser = asyncHandler(async (req, res, next) => {
+    req.filterObj = { active: true }
+    return factoryHandler.GetAll(UserModel)(req, res, next);
 })
 
 /**
@@ -60,6 +60,25 @@ exports.CreateUser = factoryHandler.CreateOne(UserModel);
  */
 exports.UpdateUserByID = factoryHandler.UpdateOne(UserModel);
 
+
+/**
+ * @desc    Change User Password
+ * @route   PUT /api/users/change-password/:id
+ * @access  Private
+ */
+exports.ChangePassword = asyncHandler(async (req, res, next) => {
+    const User = await UserModel.findById(req.params.id);
+    if (!User) {
+        return next(new ApiError("User not found", 404));
+    }
+    User.password = req.body.password;
+    await User.save();
+    res.status(200).json({
+        status: "Success",
+        message: "Password updated successfully",
+        data : User
+    });
+});
 /**
  * @desc    deactivated specific User
  * @route   DELETE  /api/users/:id

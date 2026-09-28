@@ -19,7 +19,6 @@ exports.CreateUserValidator = [
             return true;
         }),
 
-
     // Email
     check("email")
         .notEmpty()
@@ -37,13 +36,11 @@ exports.CreateUserValidator = [
             return true;
         }),
 
-
     // Phone
     check("phone")
         .optional()
         .isMobilePhone(["ar-EG"])
         .withMessage("Please enter a valid Egyptian phone number"),
-
 
     // Password
     check("password")
@@ -52,19 +49,18 @@ exports.CreateUserValidator = [
         .isLength({ min: 6 })
         .withMessage("Password must be at least 6 characters"),
 
-
-
-    // password Confirm
+    // Password Confirm
     check("passwordConfirm")
         .notEmpty()
         .withMessage("Password Confirm is required")
         .custom((val, { req }) => {
+
             if (val !== req.body.password) {
                 throw new Error("Password confirmation does not match password");
             }
+
             return true;
         }),
-
 
     // Role
     check("role")
@@ -72,13 +68,11 @@ exports.CreateUserValidator = [
         .isIn(["user", "admin"])
         .withMessage("Role must be either user or admin"),
 
-
     // Active
     check("active")
         .optional()
         .isBoolean()
         .withMessage("Active must be true or false"),
-
 
     // Run Validation
     validatorMiddleware,
@@ -96,7 +90,6 @@ exports.UpdateUserValidator = [
         .isMongoId()
         .withMessage("Invalid User ID"),
 
-
     // Name
     check("name")
         .optional()
@@ -107,7 +100,6 @@ exports.UpdateUserValidator = [
             return true;
         }),
 
-
     // Email
     check("email")
         .optional()
@@ -117,7 +109,7 @@ exports.UpdateUserValidator = [
 
             const user = await UserModel.findOne({
                 email: value,
-                _id: { $ne: req.params.id } // $ne =>  ID must not equal the current user ID 
+                _id: { $ne: req.params.id }
             });
 
             if (user) {
@@ -127,29 +119,17 @@ exports.UpdateUserValidator = [
             return true;
         }),
 
-
     // Phone
     check("phone")
         .optional()
         .isMobilePhone(["ar-EG"])
         .withMessage("Please enter a valid Egyptian phone number"),
 
-
     // Password
     check("password")
-        .optional()
-        .isLength({ min: 6 })
-        .withMessage("Password must be at least 6 characters"),
-
-    check("passwordConfirm")
-        .notEmpty()
-        .withMessage("Password Confirm is required")
-        .custom((val, { req }) => {
-            if (val !== req.body.password) {
-                throw new Error("Password confirmation does not match password");
-            }
-            return true;
-        }),
+        .not()
+        .exists()
+        .withMessage("Password cannot be updated from this endpoint"),
 
     // Role
     check("role")
@@ -157,13 +137,40 @@ exports.UpdateUserValidator = [
         .isIn(["user", "admin"])
         .withMessage("Role must be either user or admin"),
 
-
     // Active
     check("active")
         .optional()
         .isBoolean()
         .withMessage("Active must be true or false"),
 
+    // Run Validation
+    validatorMiddleware,
+];
+
+
+// ==================== Change Password Validator ====================
+
+exports.ChangePasswordValidator = [
+
+    // Password
+    check("password")
+        .notEmpty()
+        .withMessage("Password is required")
+        .isLength({ min: 6 })
+        .withMessage("Password must be at least 6 characters"),
+
+    // Password Confirm
+    check("passwordConfirm")
+        .notEmpty()
+        .withMessage("Password confirmation is required")
+        .custom((val, { req }) => {
+
+            if (val !== req.body.password) {
+                throw new Error("Password confirmation does not match password");
+            }
+
+            return true;
+        }),
 
     // Run Validation
     validatorMiddleware,
@@ -174,12 +181,14 @@ exports.UpdateUserValidator = [
 
 exports.GetUserValidator = [
 
+    // User ID
     param("id")
         .notEmpty()
         .withMessage("User ID is required")
         .isMongoId()
         .withMessage("Invalid User ID"),
 
+    // Run Validation
     validatorMiddleware,
 ];
 
@@ -188,11 +197,13 @@ exports.GetUserValidator = [
 
 exports.DeactivateUserValidator = [
 
+    // User ID
     param("id")
         .notEmpty()
         .withMessage("User ID is required")
         .isMongoId()
         .withMessage("Invalid User ID"),
 
+    // Run Validation
     validatorMiddleware,
 ];

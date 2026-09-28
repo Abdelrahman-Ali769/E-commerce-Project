@@ -6,6 +6,7 @@ const {
     GetUserByID,
     CreateUser,
     UpdateUserByID,
+    ChangePassword,
     DeactivateUserByID,
     uploadUserImage,
     ResizeImages
@@ -15,6 +16,7 @@ const {
     GetUserValidator,
     CreateUserValidator,
     UpdateUserValidator,
+    ChangePasswordValidator,
     DeactivateUserValidator
 } = require("../utils/validators/UserValidator.cjs");
 
@@ -73,6 +75,17 @@ router.put(
     UpdateUserByID
 );
 
+
+// ==================== Change Password ====================
+// PUT /api/users/change-password/:id
+// Change user password
+// Private
+
+router.put(
+    "/change-password/:id",
+    ChangePasswordValidator,
+    ChangePassword
+);
 
 // ==================== Deactivate User ====================
 // DELETE /api/users/:id
