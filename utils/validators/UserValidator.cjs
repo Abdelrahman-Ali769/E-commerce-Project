@@ -1,9 +1,8 @@
-const { check, param,body } = require("express-validator");
+const { check, param } = require("express-validator");
 const validatorMiddleware = require("../../middlewares/validatorMiddleware.cjs");
-const bcrypt = require("bcrypt")
+const bcrypt = require("bcrypt");
 const slugify = require("slugify");
 const UserModel = require("../../Models/UserSchema.cjs");
-
 
 // ==================== Create User ====================
 
@@ -53,11 +52,13 @@ exports.CreateUserValidator = [
     // Password Confirm
     check("passwordConfirm")
         .notEmpty()
-        .withMessage("Password Confirm is required")
-        .custom((val, { req }) => {
+        .withMessage("Password confirmation is required")
+        .custom((value, { req }) => {
 
-            if (val !== req.body.password) {
-                throw new Error("Password confirmation does not match password");
+            if (value !== req.body.password) {
+                throw new Error(
+                    "Password confirmation does not match password"
+                );
             }
 
             return true;
@@ -110,7 +111,7 @@ exports.UpdateUserValidator = [
 
             const user = await UserModel.findOne({
                 email: value,
-                _id: { $ne: req.params.id }
+                _id: { $ne: req.params.id },
             });
 
             if (user) {
@@ -153,41 +154,65 @@ exports.UpdateUserValidator = [
 
 exports.ChangeUserPasswordValidator = [
 
-    check("id")
+    // User ID
+    param("id")
+        .notEmpty()
+        .withMessage("User ID is required")
         .isMongoId()
-        .withMessage("Invalid User id format"),
+        .withMessage("Invalid User ID"),
 
+    // Current Password
     check("currentPassword")
         .notEmpty()
         .withMessage("You must enter your current password"),
 
+    // Password Confirm
     check("passwordConfirm")
         .notEmpty()
-        .withMessage("You must enter the password confirm"),
+        .withMessage("You must enter the password confirmation"),
 
+    // New Password
     check("password")
         .notEmpty()
-        .withMessage("You must enter new password")
-        .custom(async (val, { req }) => {
-            const User = await UserModel.findById(req.params.id)
-            if (!User) {
+        .withMessage("You must enter the new password")
+        .isLength({ min: 6 })
+        .withMessage("Password must be at least 6 characters")
+        .custom(async (value, { req }) => {
+
+            // Find User
+            const user = await UserModel.findById(req.params.id);
+
+            if (!user) {
                 throw new Error("There is no user for this id");
             }
+
+            // Check Current Password
             const isCorrectPassword = await bcrypt.compare(
                 req.body.currentPassword,
-                User.password
-            )
+                user.password
+            );
 
             if (!isCorrectPassword) {
                 throw new Error("Incorrect current password");
             }
 
-            // Verify Password Confirm 
-            if (val !== req.body.passwordConfirm) {
-                throw new Error("Password confirmation does not match password");
+            // New password must be different from current password
+            if (req.body.currentPassword === value) {
+                throw new Error(
+                    "New password cannot be the same as current password"
+                );
             }
+
+            // Check Password Confirmation
+            if (req.body.passwordConfirm !== value) {
+                throw new Error(
+                    "Password confirmation does not match password"
+                );
+            }
+
             return true;
         }),
+
     // Run Validation
     validatorMiddleware,
 ];
