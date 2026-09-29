@@ -1,5 +1,6 @@
-const { check, param } = require("express-validator");
+const { check, param,body } = require("express-validator");
 const validatorMiddleware = require("../../middlewares/validatorMiddleware.cjs");
+const bcrypt = require("bcrypt")
 const slugify = require("slugify");
 const UserModel = require("../../Models/UserSchema.cjs");
 
@@ -150,28 +151,43 @@ exports.UpdateUserValidator = [
 
 // ==================== Change Password Validator ====================
 
-exports.ChangePasswordValidator = [
+exports.ChangeUserPasswordValidator = [
 
-    // Password
-    check("password")
+    check("id")
+        .isMongoId()
+        .withMessage("Invalid User id format"),
+
+    check("currentPassword")
         .notEmpty()
-        .withMessage("Password is required")
-        .isLength({ min: 6 })
-        .withMessage("Password must be at least 6 characters"),
+        .withMessage("You must enter your current password"),
 
-    // Password Confirm
     check("passwordConfirm")
         .notEmpty()
-        .withMessage("Password confirmation is required")
-        .custom((val, { req }) => {
+        .withMessage("You must enter the password confirm"),
 
-            if (val !== req.body.password) {
-                throw new Error("Password confirmation does not match password");
+    check("password")
+        .notEmpty()
+        .withMessage("You must enter new password")
+        .custom(async (val, { req }) => {
+            const User = await UserModel.findById(req.params.id)
+            if (!User) {
+                throw new Error("There is no user for this id");
+            }
+            const isCorrectPassword = await bcrypt.compare(
+                req.body.currentPassword,
+                User.password
+            )
+
+            if (!isCorrectPassword) {
+                throw new Error("Incorrect current password");
             }
 
+            // Verify Password Confirm 
+            if (val !== req.body.passwordConfirm) {
+                throw new Error("Password confirmation does not match password");
+            }
             return true;
         }),
-
     // Run Validation
     validatorMiddleware,
 ];

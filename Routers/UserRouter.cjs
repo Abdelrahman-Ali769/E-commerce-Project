@@ -16,7 +16,7 @@ const {
     GetUserValidator,
     CreateUserValidator,
     UpdateUserValidator,
-    ChangePasswordValidator,
+    ChangeUserPasswordValidator,
     DeactivateUserValidator
 } = require("../utils/validators/UserValidator.cjs");
 
@@ -83,7 +83,7 @@ router.put(
 
 router.put(
     "/change-password/:id",
-    ChangePasswordValidator,
+    ChangeUserPasswordValidator,
     ChangePassword
 );
 
