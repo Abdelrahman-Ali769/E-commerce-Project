@@ -15,6 +15,7 @@ const SubCategoryRouter = require("./Routers/SubCategoryRouter.cjs");
 const BrandRouter = require("./Routers/BrandRouter.cjs");
 const ProductRouter = require("./Routers/ProductRouter.cjs");
 const UserRouter = require("./Routers/UserRouter.cjs");
+const AuthRouter  = require("./Routers/AuthRouter.cjs");
 const connectDB = require("./.config/DataBaseConnection.cjs");
 
 const app = express();
@@ -37,6 +38,7 @@ app.use("/api/subcategory", SubCategoryRouter);
 app.use("/api/product", ProductRouter);
 app.use("/api/brand", BrandRouter);
 app.use("/api/users", UserRouter);
+app.use("/api/auth", AuthRouter);
 
 
 // 404 Error
