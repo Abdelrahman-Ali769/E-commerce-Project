@@ -56,8 +56,8 @@ router.get(
 router.post(
     "/",
     uploadUserImage,
-    ResizeImages,
     CreateUserValidator,
+    ResizeImages,
     CreateUser
 );
 
@@ -70,8 +70,8 @@ router.post(
 router.put(
     "/:id",
     uploadUserImage,
-    ResizeImages,
     UpdateUserValidator,
+    ResizeImages,
     UpdateUserByID
 );
 

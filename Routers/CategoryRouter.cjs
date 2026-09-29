@@ -1,34 +1,73 @@
-const express = require('express')
-const { GetAllCategory, GetCategoryByID, CreateCategory, UpdateCategoryByID, DeleteCategoryByID, uploadCategoryImage,ResizeImages } = require('../Controllers/CategoryController.cjs')
-const { getCategoryValidator
-    , CreateCategoryValidator
-    , UpdateCategoryValidator
-    , DeleteCategoryValidator
-} = require('../utils/validators/CategoryValidator.cjs')
+const express = require("express");
 
-const subcategoriesRouter = require('./SubCategoryRouter.cjs')
+const {
+    GetAllCategory,
+    GetCategoryByID,
+    CreateCategory,
+    UpdateCategoryByID,
+    DeleteCategoryByID,
+    uploadCategoryImage,
+    ResizeImages,
+} = require("../Controllers/CategoryController.cjs");
 
+const {
+    getCategoryValidator,
+    CreateCategoryValidator,
+    UpdateCategoryValidator,
+    DeleteCategoryValidator,
+} = require("../utils/validators/CategoryValidator.cjs");
 
-const router = express.Router()
+const subcategoriesRouter = require("./SubCategoryRouter.cjs");
 
+const router = express.Router();
 
-// CRUD Operation From Category
+// CRUD Operations From Category
 
-//GetAllCategory
-router.get('/', GetAllCategory)
+// ==================== Get All Categories ====================
 
-//GetCategoryByID
-router.get('/:id', getCategoryValidator, GetCategoryByID)
+router.get("/", GetAllCategory);
 
-//CreateCategory
-router.post('/', uploadCategoryImage,ResizeImages,CreateCategoryValidator, CreateCategory)
+// ==================== Get Category By ID ====================
 
-//UpdateCategoryByID
-router.put('/:id',uploadCategoryImage,ResizeImages,UpdateCategoryValidator, UpdateCategoryByID)
+router.get(
+    "/:id",
+    getCategoryValidator,
+    GetCategoryByID
+);
 
-//DeleteCategoryByID
-router.delete('/:id', DeleteCategoryValidator, DeleteCategoryByID)
+// ==================== Create Category ====================
 
-router.use('/:categoryId/subcategories', subcategoriesRouter)
+router.post(
+    "/",
+    uploadCategoryImage,
+    CreateCategoryValidator,
+    ResizeImages,
+    CreateCategory
+);
 
-module.exports = router
+// ==================== Update Category ====================
+
+router.put(
+    "/:id",
+    uploadCategoryImage,
+    UpdateCategoryValidator,
+    ResizeImages,
+    UpdateCategoryByID
+);
+
+// ==================== Delete Category ====================
+
+router.delete(
+    "/:id",
+    DeleteCategoryValidator,
+    DeleteCategoryByID
+);
+
+// ==================== Subcategories ====================
+
+router.use(
+    "/:categoryId/subcategories",
+    subcategoriesRouter
+);
+
+module.exports = router;

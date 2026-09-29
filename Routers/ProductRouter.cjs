@@ -29,8 +29,8 @@ router.get("/:id", GetProductValidator, GetProductByID);
 router.post(
     "/",
     uploadProductImages,
-    resizeProductImages,
     CreateProductValidator,
+    resizeProductImages,
     CreateProduct,
 );
 
@@ -38,8 +38,8 @@ router.post(
 router.put(
     "/:id",
     uploadProductImages,
-    resizeProductImages,
     UpdateProductValidator,
+    resizeProductImages,
     UpdateProductByID,
 );
 

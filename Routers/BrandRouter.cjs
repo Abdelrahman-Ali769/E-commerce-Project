@@ -1,31 +1,67 @@
-const express = require('express')
-const {GetAllBrand,GetBrandByID,CreateBrand,UpdateBrandByID,DeleteBrandByID,uploadBrandImage,ResizeImages} = require('../Controllers/BrandController.cjs')
-const { getBrandValidator
-    , CreateBrandValidator
-    , UpdateBrandValidator
-    , DeleteBrandValidator
-} = require('../utils/validators/BrandValidator.cjs')
+const express = require("express");
 
+const {
+    GetAllBrand,
+    GetBrandByID,
+    CreateBrand,
+    UpdateBrandByID,
+    DeleteBrandByID,
+    uploadBrandImage,
+    ResizeImages,
+} = require("../Controllers/BrandController.cjs");
 
+const {
+    getBrandValidator,
+    CreateBrandValidator,
+    UpdateBrandValidator,
+    DeleteBrandValidator,
+} = require("../utils/validators/BrandValidator.cjs");
 
-const router = express.Router()
+const router = express.Router();
 
+// CRUD Operations From Brand
 
-// CRUD Operation From Brand
+// ==================== Get All Brands ====================
 
-//GetAllBrand
-router.get('/', GetAllBrand)
+router.get(
+    "/",
+    GetAllBrand
+);
 
-//GetBrandByID
-router.get('/:id', getBrandValidator, GetBrandByID)
+// ==================== Get Brand By ID ====================
 
-//CreateBrand
-router.post('/', uploadBrandImage,ResizeImages,CreateBrandValidator, CreateBrand)
+router.get(
+    "/:id",
+    getBrandValidator,
+    GetBrandByID
+);
 
-//UpdateBrandByID
-router.put('/:id',uploadBrandImage,ResizeImages,UpdateBrandValidator, UpdateBrandByID)
+// ==================== Create Brand ====================
 
-//DeleteBrandByID
-router.delete('/:id', DeleteBrandValidator, DeleteBrandByID)
+router.post(
+    "/",
+    uploadBrandImage,
+    CreateBrandValidator,
+    ResizeImages,
+    CreateBrand
+);
 
-module.exports = router
+// ==================== Update Brand ====================
+
+router.put(
+    "/:id",
+    uploadBrandImage,
+    UpdateBrandValidator,
+    ResizeImages,
+    UpdateBrandByID
+);
+
+// ==================== Delete Brand ====================
+
+router.delete(
+    "/:id",
+    DeleteBrandValidator,
+    DeleteBrandByID
+);
+
+module.exports = router;
