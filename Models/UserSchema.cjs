@@ -57,4 +57,23 @@ UserSchema.pre('save', async function () {
     }
     // next()
 })
+UserSchema.virtual("imageUrl").get(function () {
+    if (!this.ProfileImage) return null;
+
+    return `${process.env.BASE_URL}/uploads/Users/${this.ProfileImage}`;
+});
+
+const responseOptions = {
+    virtuals: true,
+    versionKey: false,
+
+    transform: (doc, response) => {
+        delete response._id;
+        return response;
+    },
+};
+
+UserSchema.set("toJSON", responseOptions);
+UserSchema.set("toObject", responseOptions);
+
 module.exports = mongoose.model('User', UserSchema);
