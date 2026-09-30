@@ -1,11 +1,11 @@
 const express = require("express");
 
 const {
-    SignUp
+    SignUp,Login
 } = require("../Controllers/AuthController.cjs");
 
 const {
-    SignUpValidator
+   SignUpValidator, LoginValidator
 } = require("../utils/validators/AuthValidator.cjs");
 
 const router = express.Router();
@@ -15,6 +15,13 @@ router.post(
     "/signup",
     SignUpValidator,
     SignUp
+);
+
+// Login
+router.post(
+    "/Login",
+    LoginValidator,
+    Login
 );
 
 module.exports = router;
