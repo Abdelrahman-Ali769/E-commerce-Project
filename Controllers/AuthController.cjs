@@ -47,7 +47,12 @@ exports.Login = asyncHandler(async (req, res, next) => {
 
     // 3- Check password
     if (!User || !(await bcrypt.compare(password, User.password))) {
-        return next(new ApiError("Incorrect email or password", 401));
+        return next(
+            new ApiError(
+                "Incorrect email or password",
+                401
+            )
+        );
     }
 
     // 4- Generate JWT Token
@@ -58,14 +63,23 @@ exports.Login = asyncHandler(async (req, res, next) => {
     // 5- Send response to client
     res.status(200).json({
         message: "Login successfully",
-        data:User,
+        data: User,
         token
     });
 });
 
+
+/**
+ * @desc    Protect Routes
+ * @route   Middleware
+ * @access  Private
+ * @note    Extract JWT token from Authorization header
+ */
 exports.Protect = asyncHandler(async (req, res, next) => {
+
     let token;
 
+    // 1- Get token from Authorization header
     if (
         req.headers.authorization &&
         req.headers.authorization.startsWith("Bearer")
@@ -73,6 +87,7 @@ exports.Protect = asyncHandler(async (req, res, next) => {
         token = req.headers.authorization.split(" ")[1];
     }
 
+    // 2- Check if token exists
     if (!token) {
         return next(
             new ApiError(
@@ -82,4 +97,12 @@ exports.Protect = asyncHandler(async (req, res, next) => {
         );
     }
 
+    // 3- Verify token
+    const decoded = jwt.verify(
+        token,
+        process.env.JWT_SECRET_KEY
+    );
+
+    console.log(decoded);
+    // next()
 });
