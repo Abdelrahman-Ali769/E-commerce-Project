@@ -102,7 +102,25 @@ exports.Protect = asyncHandler(async (req, res, next) => {
         token,
         process.env.JWT_SECRET_KEY
     );
-
     console.log(decoded);
-    // next()
+
+    // 4- Check if user still exists OR Not Active
+    const CurrentUser = await UserModel.findById(decoded.UserId)
+    if (!CurrentUser) {
+        return next(
+            new ApiError(
+                "The user belonging to this token no longer exists.",
+                401
+            )
+        );
+    }
+    if (!CurrentUser.active) {
+        return next(
+            new ApiError(
+                "Your account has been deactivated.",
+                401
+            )
+        );
+    }
+    next()
 });
