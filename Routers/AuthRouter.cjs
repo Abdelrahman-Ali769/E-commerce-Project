@@ -1,11 +1,11 @@
 const express = require("express");
 
 const {
-    SignUp,Login
+    SignUp, Login
 } = require("../Controllers/AuthController.cjs");
 
 const {
-   SignUpValidator, LoginValidator
+    SignUpValidator, LoginValidator
 } = require("../utils/validators/AuthValidator.cjs");
 
 const router = express.Router();

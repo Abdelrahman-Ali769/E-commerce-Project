@@ -122,5 +122,23 @@ exports.Protect = asyncHandler(async (req, res, next) => {
             )
         );
     }
+
+    // Check if password was changed after token was created
+    if (CurrentUser.passwordChangedAt) {
+        const passwordChangedTimestamp = parseInt(
+            CurrentUser.passwordChangedAt.getTime() / 1000,
+            10
+        );
+
+        if (passwordChangedTimestamp > decoded.iat) {
+            return next(
+                new ApiError(
+                    "Your password has been changed. Please login again.",
+                    401
+                )
+            );
+        }
+    }
+    req.user = CurrentUser
     next()
 });
