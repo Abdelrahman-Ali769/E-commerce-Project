@@ -1,4 +1,5 @@
 const express = require("express");
+
 const {
     GetAllProducts,
     GetProductByID,
@@ -8,6 +9,7 @@ const {
     uploadProductImages,
     resizeProductImages,
 } = require("../Controllers/ProductController.cjs");
+
 const {
     GetProductValidator,
     CreateProductValidator,
@@ -15,35 +17,66 @@ const {
     DeleteProductValidator,
 } = require("../utils/validators/ProductValidator.cjs");
 
+const {
+    Protect,
+    IsAllowTo
+} = require("../Controllers/AuthController.cjs");
+
 const router = express.Router();
 
-// CRUD Operation From Product
 
-//GetAllProduct
-router.get("/", GetAllProducts);
+// ==================== Get All Products ====================
 
-//GetProductByID
-router.get("/:id", GetProductValidator, GetProductByID);
+router.get(
+    "/",
+    GetAllProducts
+);
 
-//CreateProduct
+
+// ==================== Get Product By ID ====================
+
+router.get(
+    "/:id",
+    GetProductValidator,
+    GetProductByID
+);
+
+
+// ==================== Create Product ====================
+
 router.post(
     "/",
+    Protect,
+    IsAllowTo("admin", "manager"),
     uploadProductImages,
     CreateProductValidator,
     resizeProductImages,
-    CreateProduct,
+    CreateProduct
 );
 
-//UpdateProductByID
+
+// ==================== Update Product ====================
+
 router.put(
     "/:id",
+    Protect,
+    IsAllowTo("admin", "manager"),
     uploadProductImages,
     UpdateProductValidator,
     resizeProductImages,
-    UpdateProductByID,
+    UpdateProductByID
 );
 
-//DeleteProductByID
-router.delete("/:id", DeleteProductValidator, DeleteProductByID);
+
+// ==================== Delete Product ====================
+
+router.delete(
+    "/:id",
+    Protect,
+    IsAllowTo("admin", "manager"),
+    DeleteProductValidator,
+    DeleteProductByID
+);
+
 
 module.exports = router;

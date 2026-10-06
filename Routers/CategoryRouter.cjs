@@ -17,7 +17,7 @@ const {
     DeleteCategoryValidator,
 } = require("../utils/validators/CategoryValidator.cjs");
 
-const {Protect} =require('../Controllers/AuthController.cjs')
+const { Protect, IsAllowTo } = require('../Controllers/AuthController.cjs')
 const subcategoriesRouter = require("./SubCategoryRouter.cjs");
 
 const router = express.Router();
@@ -41,6 +41,7 @@ router.get(
 router.post(
     "/",
     Protect,
+    IsAllowTo('admin', 'manager'),
     uploadCategoryImage,
     CreateCategoryValidator,
     ResizeImages,
@@ -51,6 +52,8 @@ router.post(
 
 router.put(
     "/:id",
+    Protect,
+    IsAllowTo('admin', 'manager'),
     uploadCategoryImage,
     UpdateCategoryValidator,
     ResizeImages,
@@ -61,6 +64,8 @@ router.put(
 
 router.delete(
     "/:id",
+    Protect,
+    IsAllowTo('admin','manager'),
     DeleteCategoryValidator,
     DeleteCategoryByID
 );

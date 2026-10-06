@@ -1,17 +1,27 @@
-
 const UserModel = require("../Models/UserSchema.cjs");
 const factoryHandler = require("./FactoyHandlers.cjs");
 const asyncHandler = require("express-async-handler");
-const ApiError = require('../utils/ApiError.cjs')
+const ApiError = require("../utils/ApiError.cjs");
 const sharp = require("sharp");
 const { uploadSingleImage } = require("../middlewares/ImageMiddleware.cjs");
 const { v4: uuidv4 } = require("uuid");
 
-// Upload User Profile Image
+
+/**
+ * @desc    Upload User Profile Image
+ * @route   Middleware
+ * @access  Internal
+ */
 exports.uploadUserImage = uploadSingleImage("ProfileImage");
 
-// Resize User Profile Image
+
+/**
+ * @desc    Resize and save User Profile Image
+ * @route   Middleware
+ * @access  Internal
+ */
 exports.ResizeImages = asyncHandler(async (req, res, next) => {
+
     const filename = `User-${uuidv4()}-${Date.now()}.jpeg`;
 
     if (!req.file) {
@@ -29,15 +39,25 @@ exports.ResizeImages = asyncHandler(async (req, res, next) => {
     next();
 });
 
+
 /**
  * @desc    Get all Users
  * @route   GET /api/users
  * @access  Private
  */
 exports.GetAllUser = asyncHandler(async (req, res, next) => {
-    req.filterObj = { active: true }
-    return factoryHandler.GetAll(UserModel)(req, res, next);
-})
+
+    req.filterObj = {
+        active: true
+    };
+
+    return factoryHandler.GetAll(UserModel)(
+        req,
+        res,
+        next
+    );
+});
+
 
 /**
  * @desc    Get specific User by ID
@@ -46,12 +66,14 @@ exports.GetAllUser = asyncHandler(async (req, res, next) => {
  */
 exports.GetUserByID = factoryHandler.GetOne(UserModel);
 
+
 /**
  * @desc    Create new User
  * @route   POST /api/users
  * @access  Private
  */
 exports.CreateUser = factoryHandler.CreateOne(UserModel);
+
 
 /**
  * @desc    Update specific User
@@ -67,32 +89,58 @@ exports.UpdateUserByID = factoryHandler.UpdateOne(UserModel);
  * @access  Private
  */
 exports.ChangePassword = asyncHandler(async (req, res, next) => {
+
     const User = await UserModel.findById(req.params.id);
+
     if (!User) {
-        return next(new ApiError("User not found", 404));
+        return next(
+            new ApiError(
+                "User not found",
+                404
+            )
+        );
     }
+
     User.password = req.body.password;
+
     await User.save();
+
     res.status(200).json({
         status: "Success",
         message: "Password updated successfully",
-        data : User
+        data: User
     });
 });
+
+
 /**
- * @desc    deactivated specific User
- * @route   DELETE  /api/users/:id
+ * @desc    Deactivate specific User
+ * @route   DELETE /api/users/:id
  * @access  Private
  */
 exports.DeactivateUserByID = asyncHandler(async (req, res, next) => {
-    const User = await UserModel.findByIdAndUpdate(req.params.id, { active: false }, { returnDocument: "after" })
+
+    const User = await UserModel.findByIdAndUpdate(
+        req.params.id,
+        {
+            active: false
+        },
+        {
+            returnDocument: "after"
+        }
+    );
+
     if (!User) {
-        return next(new ApiError("User not found", 404));
+        return next(
+            new ApiError(
+                "User not found",
+                404
+            )
+        );
     }
+
     res.status(200).json({
         message: "User deactivated successfully",
         data: User
-    })
-
-})
-
+    });
+});

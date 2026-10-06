@@ -1,4 +1,3 @@
-
 const express = require("express");
 
 const {
@@ -20,29 +19,34 @@ const {
     DeactivateUserValidator
 } = require("../utils/validators/UserValidator.cjs");
 
+const {
+    Protect,
+    IsAllowTo
+} = require("../Controllers/AuthController.cjs");
+
 const router = express.Router();
 
 
-// CRUD Operations From User
-
 // ==================== Get All Users ====================
 // GET /api/users
-// Get all active users
-// Private
+// Admin Only
 
 router.get(
     "/",
+    Protect,
+    IsAllowTo("admin"),
     GetAllUser
 );
 
 
 // ==================== Get User By ID ====================
 // GET /api/users/:id
-// Get a specific user by ID
-// Private
+// Admin Only
 
 router.get(
     "/:id",
+    Protect,
+    IsAllowTo("admin"),
     GetUserValidator,
     GetUserByID
 );
@@ -50,11 +54,12 @@ router.get(
 
 // ==================== Create User ====================
 // POST /api/users
-// Create a new user
-// Private
+// Admin Only
 
 router.post(
     "/",
+    Protect,
+    IsAllowTo("admin"),
     uploadUserImage,
     CreateUserValidator,
     ResizeImages,
@@ -64,11 +69,12 @@ router.post(
 
 // ==================== Update User ====================
 // PUT /api/users/:id
-// Update a specific user by ID
-// Private
+// Admin Only
 
 router.put(
     "/:id",
+    Protect,
+    IsAllowTo("admin"),
     uploadUserImage,
     UpdateUserValidator,
     ResizeImages,
@@ -78,23 +84,27 @@ router.put(
 
 // ==================== Change Password ====================
 // PUT /api/users/change-password/:id
-// Change user password
-// Private
+// User can change his own password
 
 router.put(
     "/change-password/:id",
+    Protect,
     ChangeUserPasswordValidator,
     ChangePassword
 );
 
+
 // ==================== Deactivate User ====================
 // DELETE /api/users/:id
-// Deactivate a specific user by ID (Soft Delete)
-// Private
+// Admin Only
 
 router.delete(
     "/:id",
+    Protect,
+    IsAllowTo("admin"),
     DeactivateUserValidator,
     DeactivateUserByID
 );
-module.exports = router
+
+
+module.exports = router;

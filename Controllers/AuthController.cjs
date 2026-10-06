@@ -4,6 +4,11 @@ const bcrypt = require("bcrypt");
 const ApiError = require("../utils/ApiError.cjs");
 const UserModel = require("../Models/UserSchema.cjs");
 
+
+/**
+ * @desc    Create JWT Token
+ * @access  Internal
+ */
 const CreateToken = (Payload) => {
     return jwt.sign(
         Payload,
@@ -14,6 +19,12 @@ const CreateToken = (Payload) => {
     );
 };
 
+
+/**
+ * @desc    Register a new user
+ * @route   POST /api/auth/signup
+ * @access  Public
+ */
 exports.SignUp = asyncHandler(async (req, res, next) => {
 
     // 1- Create User
@@ -37,6 +48,11 @@ exports.SignUp = asyncHandler(async (req, res, next) => {
 });
 
 
+/**
+ * @desc    Login user
+ * @route   POST /api/auth/login
+ * @access  Public
+ */
 exports.Login = asyncHandler(async (req, res, next) => {
 
     // 1- Get email and password
@@ -70,10 +86,9 @@ exports.Login = asyncHandler(async (req, res, next) => {
 
 
 /**
- * @desc    Protect Routes
+ * @desc    Protect routes using JWT authentication
  * @route   Middleware
  * @access  Private
- * @note    Extract JWT token from Authorization header
  */
 exports.Protect = asyncHandler(async (req, res, next) => {
 
@@ -102,10 +117,12 @@ exports.Protect = asyncHandler(async (req, res, next) => {
         token,
         process.env.JWT_SECRET_KEY
     );
+
     console.log(decoded);
 
-    // 4- Check if user still exists OR Not Active
-    const CurrentUser = await UserModel.findById(decoded.UserId)
+    // 4- Check if user still exists
+    const CurrentUser = await UserModel.findById(decoded.UserId);
+
     if (!CurrentUser) {
         return next(
             new ApiError(
@@ -114,6 +131,8 @@ exports.Protect = asyncHandler(async (req, res, next) => {
             )
         );
     }
+
+    // 5- Check if user is active
     if (!CurrentUser.active) {
         return next(
             new ApiError(
@@ -123,8 +142,9 @@ exports.Protect = asyncHandler(async (req, res, next) => {
         );
     }
 
-    // Check if password was changed after token was created
+    // 6- Check if password was changed after token creation
     if (CurrentUser.passwordChangedAt) {
+
         const passwordChangedTimestamp = parseInt(
             CurrentUser.passwordChangedAt.getTime() / 1000,
             10
@@ -139,6 +159,32 @@ exports.Protect = asyncHandler(async (req, res, next) => {
             );
         }
     }
-    req.user = CurrentUser
-    next()
+
+    // 7- Store current user in request
+    req.user = CurrentUser;
+
+    next();
 });
+
+
+/**
+ * @desc    Authorize users based on their roles
+ * @route   Middleware
+ * @access  Private
+ */
+exports.IsAllowTo = (...roles) => {
+
+    return asyncHandler(async (req, res, next) => {
+
+        if (!roles.includes(req.user.role)) {
+            return next(
+                new ApiError(
+                    "You are not allowed to access this route",
+                    403
+                )
+            );
+        }
+
+        next();
+    });
+};

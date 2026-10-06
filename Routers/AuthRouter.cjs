@@ -1,5 +1,4 @@
 const express = require("express");
-
 const {
     SignUp, Login
 } = require("../Controllers/AuthController.cjs");

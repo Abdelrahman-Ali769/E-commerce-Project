@@ -17,6 +17,8 @@ const {
     DeleteBrandValidator,
 } = require("../utils/validators/BrandValidator.cjs");
 
+const { Protect, IsAllowTo } = require('../Controllers/AuthController.cjs')
+
 const router = express.Router();
 
 // CRUD Operations From Brand
@@ -40,6 +42,8 @@ router.get(
 
 router.post(
     "/",
+    Protect,
+    IsAllowTo('admin', 'manager'),
     uploadBrandImage,
     CreateBrandValidator,
     ResizeImages,
@@ -50,6 +54,8 @@ router.post(
 
 router.put(
     "/:id",
+    Protect,
+    IsAllowTo('admin','manager'),
     uploadBrandImage,
     UpdateBrandValidator,
     ResizeImages,
@@ -60,6 +66,8 @@ router.put(
 
 router.delete(
     "/:id",
+    Protect,
+    IsAllowTo('admin','manager'),
     DeleteBrandValidator,
     DeleteBrandByID
 );

@@ -1,24 +1,33 @@
 const ProductModel = require("../Models/ProductSchema.cjs");
-const factoryHandler = require('./FactoyHandlers.cjs')
-const {uploadMixOfImages} =require("../middlewares/ImageMiddleware.cjs")
+const factoryHandler = require("./FactoyHandlers.cjs");
+const { uploadMixOfImages } = require("../middlewares/ImageMiddleware.cjs");
 const asyncHandler = require("express-async-handler");
 const sharp = require("sharp");
 const { v4: uuidv4 } = require("uuid");
 
 
-
-
-
+/**
+ * @desc    Upload Product images
+ * @route   Middleware
+ * @access  Private
+ */
 exports.uploadProductImages = uploadMixOfImages([
     {
-        name: 'imageCover',
+        name: "imageCover",
         maxCount: 1,
     },
     {
-        name: 'images',
+        name: "images",
         maxCount: 5,
     },
 ]);
+
+
+/**
+ * @desc    Resize and save Product images
+ * @route   Middleware
+ * @access  Private
+ */
 exports.resizeProductImages = asyncHandler(async (req, res, next) => {
 
     // =========================
@@ -70,36 +79,45 @@ exports.resizeProductImages = asyncHandler(async (req, res, next) => {
     next();
 });
 
+
 /**
  * @desc    Get all Products
- * @route   GET /api/Product
+ * @route   GET /api/product
  * @access  Public
  */
-exports.GetAllProducts = factoryHandler.GetAll(ProductModel, 'Products')
+exports.GetAllProducts = factoryHandler.GetAll(
+    ProductModel,
+    "Products"
+);
+
+
 /**
  * @desc    Get specific Product by ID
- * @route   GET /api/Product/:id
+ * @route   GET /api/product/:id
  * @access  Public
  */
-exports.GetProductByID = factoryHandler.GetOne(ProductModel)
+exports.GetProductByID = factoryHandler.GetOne(ProductModel);
+
 
 /**
  * @desc    Create new Product
- * @route   POST /api/Product
+ * @route   POST /api/product
  * @access  Private
  */
-exports.CreateProduct = factoryHandler.CreateOne(ProductModel)
+exports.CreateProduct = factoryHandler.CreateOne(ProductModel);
+
 
 /**
  * @desc    Update specific Product
- * @route   PUT /api/Product/:id
+ * @route   PUT /api/product/:id
  * @access  Private
  */
-exports.UpdateProductByID = factoryHandler.UpdateOne(ProductModel)
+exports.UpdateProductByID = factoryHandler.UpdateOne(ProductModel);
+
 
 /**
  * @desc    Delete specific Product
- * @route   DELETE /api/Product/:id
+ * @route   DELETE /api/product/:id
  * @access  Private
  */
-exports.DeleteProductByID = factoryHandler.DeleteOne(ProductModel)
+exports.DeleteProductByID = factoryHandler.DeleteOne(ProductModel);
