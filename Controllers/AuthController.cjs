@@ -188,3 +188,16 @@ exports.IsAllowTo = (...roles) => {
         next();
     });
 };
+
+
+exports.ForgetPassword = asyncHandler(async (req, res, next) => {
+    const { email } = req.body;
+    const User = await UserModel.findOne({ email })
+
+    if (!User) {
+        return next(
+            new ApiError(`There is no user with this email ${email}`, 404)
+        );
+    }
+
+})
