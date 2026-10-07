@@ -1,6 +1,6 @@
 const express = require("express");
 const {
-    SignUp, Login
+    SignUp, Login,ForgotPassword
 } = require("../Controllers/AuthController.cjs");
 
 const {
@@ -23,4 +23,10 @@ router.post(
     Login
 );
 
+
+// ForgotPassword
+router.post(
+    "/ForgotPassword",
+    ForgotPassword
+);
 module.exports = router;

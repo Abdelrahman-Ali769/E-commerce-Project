@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
 const asyncHandler = require("express-async-handler");
 const bcrypt = require("bcrypt");
 const ApiError = require("../utils/ApiError.cjs");
@@ -190,7 +191,7 @@ exports.IsAllowTo = (...roles) => {
 };
 
 
-exports.ForgetPassword = asyncHandler(async (req, res, next) => {
+exports.ForgotPassword = asyncHandler(async (req, res, next) => {
     const { email } = req.body;
     const User = await UserModel.findOne({ email })
 
@@ -199,5 +200,22 @@ exports.ForgetPassword = asyncHandler(async (req, res, next) => {
             new ApiError(`There is no user with this email ${email}`, 404)
         );
     }
+    const resetCode = crypto.randomInt(100000, 1000000).toString();
 
+    // hash Reset code
+    const hashedResetCode = crypto
+        .createHash("sha256")
+        .update(resetCode)
+        .digest("hex");
+
+    User.passwordResetCode = hashedResetCode
+    // Code expires af
+    // ter 10 minutes
+    User.passwordResetExpires = Date.now() + 10 * 60 * 1000;
+
+    User.passwordResetVerified = false;
+
+    await User.save({ validateBeforeSave: false });
+
+    // Later: send resetCode via emaila
 })
