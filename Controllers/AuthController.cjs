@@ -4,6 +4,7 @@ const asyncHandler = require("express-async-handler");
 const bcrypt = require("bcrypt");
 const ApiError = require("../utils/ApiError.cjs");
 const UserModel = require("../Models/UserSchema.cjs");
+const sendEmail = require("../utils/SendEmail.cjs");
 
 
 /**
@@ -217,5 +218,44 @@ exports.ForgotPassword = asyncHandler(async (req, res, next) => {
 
     await User.save({ validateBeforeSave: false });
 
-    // Later: send resetCode via emaila
-})
+     // 5) Send reset code via email
+    const message = `Hi ${User.name},
+
+We received a request to reset the password on your E-shop Account.
+
+Your password reset code is: ${resetCode}
+
+This code is valid for 10 minutes.
+
+Enter this code to reset your password.`;
+
+    try {
+        await sendEmail({
+            to: User.email,
+            subject: "Your password reset code (valid for 10 min)",
+            message,
+        });
+    } catch (err) {
+
+    console.log("EMAIL ERROR:", err);
+
+    // Remove reset code if email failed
+    User.passwordResetCode = undefined;
+    User.passwordResetExpires = undefined;
+    User.passwordResetVerified = undefined;
+
+    await User.save();
+
+    return next(
+        new ApiError(
+            "There is an error in sending email",
+            500
+        )
+    );
+}
+
+    res.status(200).json({
+        status: "Success",
+        message: "Reset code sent to email",
+    });
+});
