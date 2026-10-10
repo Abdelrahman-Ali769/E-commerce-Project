@@ -1,6 +1,6 @@
 const express = require("express");
 const {
-    SignUp, Login,ForgotPassword
+    SignUp, Login, ForgotPassword, verifyPassResetCode
 } = require("../Controllers/AuthController.cjs");
 
 const {
@@ -29,4 +29,12 @@ router.post(
     "/ForgotPassword",
     ForgotPassword
 );
+
+// verifyPassResetCode 
+router.post(
+    "/VerifyResetCode",
+    verifyPassResetCode
+);
+
+
 module.exports = router;
