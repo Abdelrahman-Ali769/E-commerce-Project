@@ -256,3 +256,89 @@ exports.verifyPassResetCode = asyncHandler(async (req, res, next) => {
         message: "Reset code verified successfully"
     })
 });
+
+
+/** 
+ * @desc    Reset user password after verifying reset code
+ * @route   PUT /api/auth/resetPassword
+ * @access  Public
+ */
+
+
+exports.resetPassword = asyncHandler(async (req, res, next) => {
+    const { email, newPassword } = req.body;
+
+    //  Validate new password
+    if (typeof newPassword !== "string" || newPassword.length < 6) {
+        return next(
+            new ApiError("Password must be at least 6 characters", 400)
+        );
+    }
+
+
+    //  Find user
+    const User = await UserModel.findOne({ email });
+
+    if (!User) {
+        return next(
+            new ApiError(`There is no user with email ${email}`, 404)
+        );
+    }
+
+    //  Check reset code verification
+    if (User.passwordResetVerified !== true) {
+        return next(
+            new ApiError("Reset code not verified", 400)
+        );
+    }
+
+    // Check reset code expiration
+    if (
+        !User.passwordResetExpires ||
+        User.passwordResetExpires.getTime() < Date.now()
+    ) {
+        return next(
+            new ApiError("Reset code has expired", 400)
+        );
+    }
+
+    // Check if new password is the same as the old password
+    const isSamePassword = await bcrypt.compare(
+        newPassword,
+        User.password
+    );
+
+    if (isSamePassword) {
+        return next(
+            new ApiError(
+                "New password cannot be the same as the old password",
+                400
+            )
+        );
+    }
+
+    // Update password
+    User.password = newPassword;
+
+    //  Clear reset code data
+    User.passwordResetCode = undefined;
+    User.passwordResetExpires = undefined;
+    User.passwordResetVerified = false;
+
+
+
+    //  Save user
+    await User.save();
+
+    // Generate JWT token
+    const token = CreateToken({
+        UserId: User._id,
+    });
+
+    //  Send response
+    res.status(200).json({
+        status: "success",
+        message: "Password reset successfully",
+        token,
+    });
+});
