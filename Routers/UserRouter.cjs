@@ -8,7 +8,8 @@ const {
     ChangePassword,
     DeactivateUserByID,
     uploadUserImage,
-    ResizeImages
+    ResizeImages,
+    getLoggedUserData
 } = require("../Controllers/UserController.cjs");
 
 const {
@@ -26,6 +27,16 @@ const {
 
 const router = express.Router();
 
+// ==================== Get Logged User Data ====================
+// GET /api/users/getMe
+// Logged-in User Only
+
+router.get(
+    "/getMe",
+    Protect,
+    getLoggedUserData,
+    GetUserByID
+);
 
 // ==================== Get All Users ====================
 // GET /api/users

@@ -144,3 +144,13 @@ exports.DeactivateUserByID = asyncHandler(async (req, res, next) => {
         data: User
     });
 });
+
+/**
+ * @desc    Get logged-in user data
+ * @route   GET /api/users/getMe
+ * @access  Private
+ */
+exports.getLoggedUserData = asyncHandler(async (req, res, next) => {
+    req.params.id = req.user._id;
+    next();
+});
