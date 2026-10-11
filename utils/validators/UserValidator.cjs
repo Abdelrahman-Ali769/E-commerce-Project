@@ -217,6 +217,69 @@ exports.ChangeUserPasswordValidator = [
     validatorMiddleware,
 ];
 
+// ==================== Update Logged User Data Validator ====================
+
+exports.UpdateLoggedUserDataValidator = [
+
+    // Name
+    check("name")
+        .optional()
+        .isLength({ min: 2, max: 30 })
+        .withMessage("Name must be between 2 and 30 characters")
+        .custom((value, { req }) => {
+            req.body.slug = slugify(value);
+            return true;
+        }),
+
+    // Email
+    check("email")
+        .optional()
+        .isEmail()
+        .withMessage("Please enter a valid email")
+        .custom(async (value) => {
+            const user = await UserModel.findOne({ email: value });
+
+            if (user) {
+                throw new Error("Email already exists");
+            }
+
+            return true;
+        }),
+
+    // Phone
+    check("phone")
+        .optional()
+        .isMobilePhone(["ar-EG"])
+        .withMessage("Please enter a valid Egyptian phone number"),
+
+    // Password
+    check("password")
+        .not()
+        .exists()
+        .withMessage("Password cannot be updated from this endpoint"),
+
+    // Password Confirmation
+    check("passwordConfirm")
+        .not()
+        .exists()
+        .withMessage("Password confirmation cannot be sent to this endpoint"),
+
+    // Role
+    check("role")
+        .not()
+        .exists()
+        .withMessage("Role cannot be updated from this endpoint"),
+
+    // Active
+    check("active")
+        .not()
+        .exists()
+        .withMessage("Active status cannot be updated from this endpoint"),
+
+    // Run Validation
+    validatorMiddleware,
+];
+
 
 // ==================== Get User By ID ====================
 

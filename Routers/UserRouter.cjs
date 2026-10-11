@@ -10,7 +10,8 @@ const {
     uploadUserImage,
     ResizeImages,
     getLoggedUserData,
-    updateLoggedUserPassword
+    updateLoggedUserPassword,
+    updateLoggedUserData
 } = require("../Controllers/UserController.cjs");
 
 const {
@@ -18,6 +19,7 @@ const {
     CreateUserValidator,
     UpdateUserValidator,
     ChangeUserPasswordValidator,
+    UpdateLoggedUserDataValidator,
     DeactivateUserValidator
 } = require("../utils/validators/UserValidator.cjs");
 
@@ -47,6 +49,17 @@ router.put(
     "/updateMyPassword",
     Protect,
     updateLoggedUserPassword
+);
+
+// ==================== Update Logged User Data ====================
+// PUT /api/users/updateMe
+// Logged-in User Only
+
+router.put(
+    "/updateMe",
+    Protect,
+    UpdateLoggedUserDataValidator,
+    updateLoggedUserData
 );
 
 // ==================== Get All Users ====================

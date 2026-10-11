@@ -203,3 +203,44 @@ exports.updateLoggedUserPassword = asyncHandler(async (req, res, next) => {
         token
     });
 });
+
+
+/**
+ * @desc    Update logged-in user data (without password or role)
+ * @route   PUT /api/users/updateMe
+ * @access  Private
+ */
+exports.updateLoggedUserData = asyncHandler(async (req, res, next) => {
+    // Prevent updating password or role
+    if (req.body.password || req.body.role) {
+        return next(
+            new ApiError(
+                "Use the correct route to update password or role",
+                400
+            )
+        );
+    }
+
+    const updatedUser = await UserModel.findByIdAndUpdate(
+        req.user._id,
+        {
+            name: req.body.name,
+            email: req.body.email,
+            phone: req.body.phone
+        },
+        {
+            new: true,
+            runValidators: true
+        }
+    );
+
+    if (!updatedUser) {
+        return next(new ApiError("User not found", 404));
+    }
+
+    res.status(200).json({
+        status: "success",
+        data: updatedUser
+    });
+});
+
