@@ -11,7 +11,8 @@ const {
     ResizeImages,
     getLoggedUserData,
     updateLoggedUserPassword,
-    updateLoggedUserData
+    updateLoggedUserData,
+    deactivateLoggedUser
 } = require("../Controllers/UserController.cjs");
 
 const {
@@ -61,6 +62,18 @@ router.put(
     UpdateLoggedUserDataValidator,
     updateLoggedUserData
 );
+
+
+// ==================== Deactivate Logged User ====================
+// PUT /api/users/deactivateMe
+// Logged-in User Only
+
+router.put(
+    "/deactivateMe",
+    Protect,
+    deactivateLoggedUser
+);
+
 
 // ==================== Get All Users ====================
 // GET /api/users

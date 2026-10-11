@@ -229,9 +229,9 @@ exports.updateLoggedUserData = asyncHandler(async (req, res, next) => {
             phone: req.body.phone
         },
         {
-            new: true,
-            runValidators: true
-        }
+            "returnDocument": "after",
+            runValidators: true, // Ensures updated data follows the validation rules defined in the schema        
+            }
     );
 
     if (!updatedUser) {
@@ -243,4 +243,26 @@ exports.updateLoggedUserData = asyncHandler(async (req, res, next) => {
         data: updatedUser
     });
 });
+
+
+
+/** 
+  *  @desc    Deactivate logged user account
+  *  @route   PUT /api/users/deactivateMe
+  *  @access  Private
+*/
+
+exports.deactivateLoggedUser = asyncHandler(async (req, res, next) => {
+    const User = await UserModel.findByIdAndUpdate(req.user._id, { active: false }, { "returnDocument": "after" })
+    if (!User) {
+        return next(new ApiError("User not found", 404));
+    }
+
+    res.status(200).json({
+        status: "success",
+        message: "Your account has been deactivated"
+    });
+});
+
+
 
