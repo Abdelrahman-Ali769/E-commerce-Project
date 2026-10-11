@@ -1,3 +1,4 @@
+
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt')
 const UserSchema = new mongoose.Schema(
@@ -33,12 +34,28 @@ const UserSchema = new mongoose.Schema(
             type: String,
             required: [true, 'Password is required'],
             minlength: [6, 'Password is too short'],
+            select: false
         },
 
-        passwordChangedAt: Date,
-        passwordResetCode : String,
-        passwordResetExpires : Date,
-        passwordResetVerified : Boolean,
+        passwordChangedAt: {
+            type: Date,
+            select: false
+        },
+
+        passwordResetCode: {
+            type: String,
+            select: false
+        },
+
+        passwordResetExpires: {
+            type: Date,
+            select: false
+        },
+
+        passwordResetVerified: {
+            type: Boolean,
+            select: false
+        },
 
         role: {
             type: String,
@@ -55,6 +72,7 @@ const UserSchema = new mongoose.Schema(
         timestamps: true,
     }
 );
+
 UserSchema.pre('save', async function () {
     const user = this
     if (user.isModified("password")) {
@@ -63,6 +81,7 @@ UserSchema.pre('save', async function () {
     }
     // next()
 })
+
 UserSchema.virtual("imageUrl").get(function () {
     if (!this.ProfileImage) return null;
 
@@ -75,6 +94,7 @@ const responseOptions = {
 
     transform: (doc, response) => {
         delete response._id;
+        delete response.password;
         return response;
     },
 };

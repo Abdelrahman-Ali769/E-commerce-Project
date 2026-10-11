@@ -44,11 +44,18 @@ exports.Login = asyncHandler(async (req, res, next) => {
     const { email, password } = req.body;
 
     // 2- Check if user exists
-    const User = await UserModel.findOne({ email });
+    const User = await UserModel.findOne({ email }).select("+password");
 
     // 3- Check password
     if (!User || !(await bcrypt.compare(password, User.password))) {
         return next(new ApiError("Incorrect email or password", 401));
+    }
+
+    // Check if user account is active
+    if (!User.active) {
+        return next(
+            new ApiError("Your account is inactive. Please contact the administrator.", 403)
+        );
     }
 
     // 4- Generate JWT Token
@@ -91,7 +98,7 @@ exports.Protect = asyncHandler(async (req, res, next) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
 
     // 4- Check if user still exists
-    const CurrentUser = await UserModel.findById(decoded.UserId);
+    const CurrentUser = await UserModel.findById(decoded.UserId).select("+passwordChangedAt");
 
     if (!CurrentUser) {
         return next(
@@ -233,7 +240,7 @@ exports.verifyPassResetCode = asyncHandler(async (req, res, next) => {
         passwordResetCode: hashedResetCode,
         passwordResetExpires: { $gt: Date.now() },
         passwordResetVerified: false,
-    });
+    }).select("+passwordResetCode +passwordResetExpires +passwordResetVerified");
 
     if (!User) {
         return next(new ApiError("Reset code invalid or expired", 400));
@@ -267,7 +274,7 @@ exports.resetPassword = asyncHandler(async (req, res, next) => {
 
 
     //  Find user
-    const User = await UserModel.findOne({ email });
+    const User = await UserModel.findOne({ email }).select("+password +passwordChangedAt +passwordResetCode +passwordResetExpires +passwordResetVerified");
 
     if (!User) {
         return next(
