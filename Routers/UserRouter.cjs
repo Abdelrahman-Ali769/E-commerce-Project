@@ -9,7 +9,8 @@ const {
     DeactivateUserByID,
     uploadUserImage,
     ResizeImages,
-    getLoggedUserData
+    getLoggedUserData,
+    updateLoggedUserPassword
 } = require("../Controllers/UserController.cjs");
 
 const {
@@ -36,6 +37,16 @@ router.get(
     Protect,
     getLoggedUserData,
     GetUserByID
+);
+
+// ==================== Update Logged User Password ====================
+// PUT /api/users/updateMyPassword
+// Logged-in User Only
+
+router.put(
+    "/updateMyPassword",
+    Protect,
+    updateLoggedUserPassword
 );
 
 // ==================== Get All Users ====================

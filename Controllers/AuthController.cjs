@@ -5,16 +5,8 @@ const bcrypt = require("bcrypt");
 const ApiError = require("../utils/ApiError.cjs");
 const UserModel = require("../Models/UserSchema.cjs");
 const sendEmail = require("../utils/SendEmail.cjs");
+const CreateToken = require("../utils/CreateToken.cjs");
 
-/**
- * @desc    Create JWT Token
- * @access  Internal
- */
-const CreateToken = (Payload) => {
-    return jwt.sign(Payload, process.env.JWT_SECRET_KEY, {
-        expiresIn: process.env.JWT_EXPIRE_TIME,
-    });
-};
 
 /**
  * @desc    Register a new user
@@ -97,8 +89,6 @@ exports.Protect = asyncHandler(async (req, res, next) => {
 
     // 3- Verify token
     const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
-
-    console.log(decoded);
 
     // 4- Check if user still exists
     const CurrentUser = await UserModel.findById(decoded.UserId);
