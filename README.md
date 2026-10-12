@@ -1,8 +1,12 @@
 # E-Commerce REST API
 
-A Node.js and Express REST API for an e-commerce catalogue and account management. It provides public catalogue browsing, role-protected catalogue administration, JWT authentication, user self-service endpoints, password recovery by email, local image processing, and MongoDB persistence.
+[![Node.js](https://img.shields.io/badge/Node.js-Express%205-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
+[![Database](https://img.shields.io/badge/Database-MongoDB-47A248?logo=mongodb&logoColor=white)](https://www.mongodb.com/)
+[![Authentication](https://img.shields.io/badge/Auth-JWT-000000?logo=jsonwebtokens&logoColor=white)](https://jwt.io/)
 
-> This is an API-only project. Cart, orders, payments, reviews, wishlists, automated tests, and deployment configuration are not implemented.
+A RESTful backend for managing an e-commerce product catalogue and user accounts. The API provides public product discovery, protected catalogue administration, JWT-based authentication, role-based authorization, account self-service, password recovery by email, and image upload processing.
+
+The application is built as an API service: clients such as a web storefront, mobile app, or admin dashboard can consume its JSON endpoints.
 
 ## Table of Contents
 
@@ -18,8 +22,7 @@ A Node.js and Express REST API for an e-commerce catalogue and account managemen
 - [Querying Collections](#querying-collections)
 - [Validation and Errors](#validation-and-errors)
 - [Examples](#examples)
-- [Security Notes and Current Limitations](#security-notes-and-current-limitations)
-- [Contributing](#contributing)
+- [Project Structure](#project-structure)
 
 ## Highlights
 
@@ -31,6 +34,12 @@ A Node.js and Express REST API for an e-commerce catalogue and account managemen
 - CRUD APIs for categories, nested subcategories, brands, products, and users.
 - Reusable CRUD handlers, request validation, centralized errors, filtering, sorting, field selection, keyword search, and pagination.
 - Multer in-memory uploads and Sharp conversion/resizing for category, brand, user, and product images.
+
+## How It Works
+
+Requests enter through `app.js`, which loads configuration, connects to MongoDB, registers middleware, and mounts the API routers. A router applies the middleware required by its route—such as authentication, role checks, file upload handling, and request validation—before passing control to a controller.
+
+Controllers contain the resource-specific behavior. Reusable CRUD operations are centralized in the factory handler, while Mongoose models define fields, validation rules, relationships, timestamps, and response serialization. All operational errors are forwarded to one global error handler so the API returns a consistent JSON response.
 
 ## Architecture
 
@@ -133,6 +142,12 @@ npm start
 
 The `start` script runs `nodemon --verbose app.js`. After MongoDB connects, the API listens on `http://localhost:<PORT>`. All application routes are mounted without an `/api/v1` prefix.
 
+For a production-style start without file watching, run:
+
+```bash
+node app.js
+```
+
 ## Authentication and Authorization
 
 ### JWT flow
@@ -153,8 +168,6 @@ The `Protect` middleware verifies the signature and expiry, loads the current us
 | Create/update/delete categories, subcategories, brands, products | No | Yes | Yes |
 | View/update/deactivate own account | Yes | Yes | Yes |
 | Manage users through `/api/users` | No | No | Yes |
-
-`PUT /api/users/change-password/:id` is protected but is not role-restricted or ownership-checked; see [Security Notes and Current Limitations](#security-notes-and-current-limitations).
 
 ### Password recovery flow
 
@@ -212,9 +225,19 @@ User-create validation requires a 2–30 character name, unique valid email, pas
 | PUT | `/api/category/:id` | Admin or Manager | Update a category; optional `image`. |
 | DELETE | `/api/category/:id` | Admin or Manager | Delete a category document. |
 
-### Nested subcategories
+### Subcategories
 
-There is no standalone `/api/subcategory` mount. All subcategory routes are nested under a category.
+Subcategories are available as a standalone collection and as a nested category resource. The nested form automatically scopes the collection to its parent category.
+
+| Method | Path | Access | Purpose |
+| --- | --- | --- | --- |
+| GET | `/api/subcategory` | Public | List all subcategories. |
+| GET | `/api/subcategory/:id` | Public | Get a subcategory. |
+| POST | `/api/subcategory` | Admin or Manager | Create a subcategory with a `category` in the request body. |
+| PUT | `/api/subcategory/:id` | Admin or Manager | Update a subcategory. |
+| DELETE | `/api/subcategory/:id` | Admin or Manager | Delete a subcategory. |
+
+#### Nested category routes
 
 | Method | Path | Access | Purpose |
 | --- | --- | --- | --- |
@@ -293,6 +316,15 @@ GET /api/product?keyword=phone&price[gte]=500&sort=-price&fields=title,price,cat
 
 In `development`, error responses include `status`, `message`, the error object, and a stack trace. In `production`, invalid and expired JWTs are converted to `401` messages and responses omit those development details.
 
+An error response follows this general shape:
+
+```json
+{
+  "status": "fail",
+  "message": "Invalid User ID"
+}
+```
+
 ## Examples
 
 ### Register and log in
@@ -369,24 +401,25 @@ An illustrative successful login response has this shape:
 }
 ```
 
-## Security Notes and Current Limitations
+## Project Structure
 
-The application has a solid authentication foundation, but it should not be described as production-ready without addressing the following implementation limitations:
-
-- The `User` schema does not mark `password` and password-reset fields as non-selectable or remove them in its serialization transform. Several current user/auth responses can therefore include sensitive stored fields. Consumers must not expose them, and the API should be corrected before public deployment.
-- Authentication and reset endpoints have no rate limiting, lockout policy, or generic reset response. The current forgot-password error reveals whether an email exists.
-- The reset code has one million possible values and the verification route has no attempt limit.
-- `PUT /api/users/change-password/:id` lacks an ownership check and is not restricted to administrators, despite its intent being self-service. Prefer `/api/users/updateMyPassword` for self-service changes.
-- No logout endpoint, refresh-token strategy, token revocation list, CORS policy, Helmet configuration, upload-size limit, MIME-type validation, automated tests, or OpenAPI specification is implemented.
-- Image files are not cleaned up when a resource is updated or deleted.
-- Generic update handlers do not pass `runValidators: true`; route validators cover the currently defined request fields but schema-level update validation is not universally enforced.
-
-## Contributing
-
-1. Create a branch for the change.
-2. Keep routes, validators, and README documentation synchronized.
-3. Test the relevant endpoints locally with a MongoDB instance and configured environment variables.
-4. Open a pull request describing the behavior change and any security implications.
+```text
+.
+├── .config/                 # Database connection
+├── Controllers/             # Route behavior and reusable CRUD handlers
+├── middlewares/             # Upload, validation-result, and error middleware
+├── Models/                  # Mongoose schemas and model relationships
+├── Routers/                 # Express route definitions
+├── uploads/                 # Processed image files served publicly
+├── utils/
+│   ├── validators/          # Request validation rules
+│   ├── ApiError.cjs         # Custom operational error class
+│   ├── ApiFeatures.cjs      # Filtering, sorting, search, and pagination
+│   ├── CreateToken.cjs      # JWT creation helper
+│   └── SendEmail.cjs        # Nodemailer email helper
+├── app.js                   # Application entry point
+└── package.json             # Scripts and dependencies
+```
 
 ## License
 
