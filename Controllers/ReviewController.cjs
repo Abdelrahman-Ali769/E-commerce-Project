@@ -1,5 +1,6 @@
 
 const ReviewModel = require("../Models/ReviewSchema.cjs");
+const asyncHandler = require('express-async-handler')
 const factoryHandler = require("./FactoyHandlers.cjs");
 
 /**
@@ -21,7 +22,16 @@ exports.GetReviewByID = factoryHandler.GetOne(ReviewModel);
  * @route   POST /api/review
  * @access  Private (User, Manager, Admin)
  */
-exports.CreateReview = factoryHandler.CreateOne(ReviewModel);
+exports.CreateReview = asyncHandler(async (req, res) => {
+    const Document = await ReviewModel.create({
+        ...req.body,
+        user: req.user._id
+    })
+    res.status(201).json({
+        message: "Review created successfully.",
+        data: Document
+    })
+})
 
 /**
  * @desc    Update a specific Review

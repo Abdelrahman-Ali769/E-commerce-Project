@@ -9,6 +9,11 @@ const {
     DeleteReviewByID
 } = require("../Controllers/ReviewController.cjs");
 
+
+const {
+    getReviewValidator,
+    CreateReviewValidator
+} =require('../utils/validators/ReviewValidator.cjs')
 const { Protect, IsAllowTo } = require('../Controllers/AuthController.cjs');
 
 const router = express.Router();
@@ -34,6 +39,7 @@ router.get(
  */
 router.get(
     "/:id",
+    getReviewValidator,
     GetReviewByID
 );
 
@@ -48,6 +54,7 @@ router.post(
     "/",
     Protect,
     IsAllowTo('user'),
+    CreateReviewValidator,
     CreateReview
 );
 
