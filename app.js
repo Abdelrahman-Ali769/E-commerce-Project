@@ -40,7 +40,7 @@ app.use("/api/product", ProductRouter);
 app.use("/api/brand", BrandRouter);
 app.use("/api/users", UserRouter);
 app.use("/api/auth", AuthRouter);
-app.use("/api/review", AuthRouter);
+app.use("/api/review", ReviewRouter);
 
 
 // 404 Error
