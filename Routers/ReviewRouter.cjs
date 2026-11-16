@@ -12,7 +12,8 @@ const {
 
 const {
     getReviewValidator,
-    CreateReviewValidator
+    CreateReviewValidator,
+    UpdateReviewValidator
 } =require('../utils/validators/ReviewValidator.cjs')
 const { Protect, IsAllowTo } = require('../Controllers/AuthController.cjs');
 
@@ -69,6 +70,7 @@ router.put(
     "/:id",
     Protect,
     IsAllowTo('user'),
+    UpdateReviewValidator,
     UpdateReviewByID
 );
 

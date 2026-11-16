@@ -52,4 +52,47 @@ exports.CreateReviewValidator = [
 ];
 
 // Update-Review-validator
+
+
+exports.UpdateReviewValidator = [
+    check('id')
+        .isMongoId()
+        .withMessage("Invalid Review ID Format")
+        .bail()
+        .custom(async (val, { req }) => {
+            const existingReview = await ReviewModel.findById(val);
+
+            if (!existingReview) {
+                throw new Error(`There is no Review With this ${val}`);
+            }
+
+            if (existingReview.user.toString() !== req.user._id.toString()) {
+                throw new Error("You can't Edit this Review Because this is not your Review");
+            }
+
+            return true;
+        }),
+
+    check("title")
+        .optional()
+        .trim()
+        .notEmpty()
+        .withMessage("Review title required")
+        .isLength({ min: 3 })
+        .withMessage('Review title is too short'),
+
+    check('rating')
+        .optional()
+        .isFloat({ min: 1, max: 5 })
+        .withMessage('Rating value must be between 1 and 5'),
+
+    check('review')
+        .optional()
+        .trim()
+        .notEmpty()
+        .withMessage('Review required'),
+
+    ReviewValidator
+];
+
 // Delete-Review-validator
