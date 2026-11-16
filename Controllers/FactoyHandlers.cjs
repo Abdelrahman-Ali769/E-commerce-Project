@@ -1,3 +1,4 @@
+
 const asyncHandler = require("express-async-handler");
 const ApiError = require("../utils/ApiError.cjs");
 const ApiFeatures = require("../utils/ApiFeatures.cjs");
@@ -41,7 +42,8 @@ exports.UpdateOne = (Model) => asyncHandler(async (req, res, next) => {
         req.params.id,
         req.body,
         {
-            returnDocument: "after",
+            new: true,
+            runValidators: true
         }
     );
 

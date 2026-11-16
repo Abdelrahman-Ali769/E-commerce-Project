@@ -96,3 +96,30 @@ exports.UpdateReviewValidator = [
 ];
 
 // Delete-Review-validator
+
+
+exports.DeleteReviewValidator = [
+    check('id')
+        .isMongoId()
+        .withMessage("Invalid Review ID Format")
+        .bail()
+        .custom(async (val, { req }) => {
+
+            const existingReview = await ReviewModel.findById(val);
+
+            if (!existingReview) {
+                throw new Error(`There is no Review With this ${val}`);
+            }
+
+            if (
+                req.user.role === 'user' &&
+                existingReview.user.toString() !== req.user._id.toString()
+            ) {
+                throw new Error("You can't Delete this Review Because this is not your Review");
+            }
+
+            return true;
+        }),
+
+    ReviewValidator
+];

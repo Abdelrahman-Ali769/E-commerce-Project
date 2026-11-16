@@ -13,7 +13,8 @@ const {
 const {
     getReviewValidator,
     CreateReviewValidator,
-    UpdateReviewValidator
+    UpdateReviewValidator,
+    DeleteReviewValidator
 } =require('../utils/validators/ReviewValidator.cjs')
 const { Protect, IsAllowTo } = require('../Controllers/AuthController.cjs');
 
@@ -85,6 +86,7 @@ router.delete(
     "/:id",
     Protect,
     IsAllowTo('admin', 'manager','user'),
+    DeleteReviewValidator,
     DeleteReviewByID
 );
 
