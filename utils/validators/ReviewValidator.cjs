@@ -66,7 +66,7 @@ exports.UpdateReviewValidator = [
                 throw new Error(`There is no Review With this ${val}`);
             }
 
-            if (existingReview.user.toString() !== req.user._id.toString()) {
+            if (existingReview.user._id.toString() !== req.user._id.toString()) {
                 throw new Error("You can't Edit this Review Because this is not your Review");
             }
 
