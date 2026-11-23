@@ -102,6 +102,13 @@ const ProductSchema = new mongoose.Schema(
         timestamps: true,
     }
 );
+ProductSchema.virtual('reviews',
+    {
+        ref: 'Review',
+        foreignField: 'product',
+        localField: '_id'
+    }
+)
 ProductSchema.pre(/^find/, function () {
     this.populate([
         {

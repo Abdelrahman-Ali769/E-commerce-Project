@@ -96,7 +96,7 @@ exports.GetAllProducts = factoryHandler.GetAll(
  * @route   GET /api/product/:id
  * @access  Public
  */
-exports.GetProductByID = factoryHandler.GetOne(ProductModel);
+exports.GetProductByID = factoryHandler.GetOne(ProductModel,[{path  :'reviews'}]);
 
 
 /**
